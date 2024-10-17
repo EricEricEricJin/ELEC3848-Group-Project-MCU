@@ -1,19 +1,17 @@
 #include <Arduino.h>
 
-extern "C"
-{
-// Fuck CPP
-#include "mecanum.h"
-#include "log.h"
-}
+#include "init.h"  
 
 void setup()
 {
-    // put your setup code here, to run once:
-    log_i("THIS IS A LOG");
+    hw_setup();
+    sys_setup();
+    task_setup();
 }
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
+    hw_loop();
+    sys_loop();
+    task_loop();
 }
