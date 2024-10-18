@@ -11,6 +11,7 @@ int done = 1;
 long distance_in_cm;
 
 MPU6050 mpu(Wire); // Create MPU6050 object
+
 void sensor_setup() {
     Serial.begin(115200);
     ultra_setup();
