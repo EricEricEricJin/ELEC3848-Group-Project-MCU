@@ -4,7 +4,7 @@
 typedef struct SensorData *Sensordata
 
 void sensor_setup();
-void sensor_loop();
+void sensor_loop(SensorData sensorData);
 
 
 // Struct to store sensor data
