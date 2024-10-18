@@ -17,7 +17,7 @@ void sys_setup()
 void task_setup()
 {
     chassis_setup();
-    sensor_setup();
+    sensor_setup(SensorData sensorData);
 }
 
 void hw_loop()
