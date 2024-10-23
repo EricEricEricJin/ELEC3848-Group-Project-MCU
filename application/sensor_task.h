@@ -10,6 +10,8 @@ typedef struct SensorData {
     long max_current;
 } SensorData;
 
+extern SensorData sensorData;
+
 void sensor_setup();
 void sensor_loop(SensorData* sensorData);  
 #endif

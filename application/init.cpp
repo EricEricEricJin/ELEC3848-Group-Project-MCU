@@ -5,7 +5,6 @@
 #include "chassis_task.h"
 #include "sensor_task.h"
 
-SensorData sensorData;
 
 void hw_setup()
 {
@@ -36,11 +35,16 @@ void task_loop()
 {
     chassis_loop();
     sensor_loop(&sensorData);
-    Serial.println("Distance: ",sensorData.distance);
-    Serial.println("angle x: ",sensorData.angleX);
-    Serial.println("angle y: ",sensorData.angleY);
-    Serial.println("angle z: ",sensorData.angleZ);
-    Serial.println("Maximum Voltage: ",sensorData.max_voltage);
-    Serial.println("Maximum Current: ",sensorData.max_current);
-
+    Serial.print("Distance: ");
+    Serial.println(sensorData.distance);
+    Serial.print("angle x: ");
+    Serial.println(sensorData.angleX);
+    Serial.print("angle y: ");
+    Serial.println(sensorData.angleY);
+    Serial.print("angle z: ");
+    Serial.println(sensorData.angleZ);
+    Serial.print("Maximum Voltage: ");
+    Serial.println(sensorData.max_voltage);
+    Serial.print("Maximum Current: ");
+    Serial.println(sensorData.max_current);
 }
