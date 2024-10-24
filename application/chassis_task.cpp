@@ -61,10 +61,10 @@ void chassis_setup()
     motor_register(&lft_rr);
     motor_register(&rgt_rr);
 
-    motor_set_duty(&lft_frt, 100);
-    motor_set_duty(&rgt_frt, 100);
-    motor_set_duty(&lft_rr, 100);
-    motor_set_duty(&rgt_rr, 100);
+    //motor_set_duty(&lft_frt, 100);
+    //motor_set_duty(&rgt_frt, 100);
+    //motor_set_duty(&lft_rr, 100);
+    //motor_set_duty(&rgt_rr, 100);
 }
 
 

@@ -1,17 +1,29 @@
 #ifndef __sensor_TASK_H__
 #define __sensor_TASK_H__
 
-typedef struct SensorData {
+
+struct SensorData {
     long distance;
     float angleX;
     float angleY;
     float angleZ;
     long max_voltage;
     long max_current;
-} SensorData;
+};
 
-extern SensorData sensorData;
+typedef struct SensorData* SensorData_t;
+
+
+void ultra_setup();
+void gyro_setup();
+void INA226_setup();
+void measure_distance();
+void measure_angle();
+void INA226_measure();
+
+SensorData_t get_sensor_data();
 
 void sensor_setup();
-void sensor_loop(SensorData* sensorData);  
+void sensor_loop();  
+
 #endif
