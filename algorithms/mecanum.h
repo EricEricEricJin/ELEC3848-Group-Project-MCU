@@ -26,41 +26,34 @@
 
 /************************ chassis parameter ****************************/
 /* the radius of wheel(mm) */
-#define RADIUS 76
+#define RADIUS 40
 /* the perimeter of wheel(mm) */
-#define PERIMETER 478
+#define PERIMETER 250
 
 // #include "appcfg.h"
 
-#ifdef ICRA2019
-    /* wheel track distance(mm) */
-    #define WHEELTRACK 394
-    /* wheelbase distance(mm) */
-    #define WHEELBASE 415
-#else
-    /* wheel track distance(mm) */
-    #define WHEELTRACK 400
-    /* wheelbase distance(mm) */
-    #define WHEELBASE 376
-#endif
+/* wheel track distance(mm) */
+#define WHEELTRACK 210
+/* wheelbase distance(mm) */
+#define WHEELBASE 166
 
 /* gimbal is relative to chassis center x axis offset(mm) */
-#define ROTATE_X_OFFSET 7
+#define ROTATE_X_OFFSET 0
 /* gimbal is relative to chassis center y axis offset(mm) */
 #define ROTATE_Y_OFFSET 0
 
-/* chassis motor use 3508 */
+/* chassis motor use the rubbish DC motor */
 /* the deceleration ratio of chassis motor */
-#define MOTOR_DECELE_RATIO (1.0f / 19.0f)
+#define MOTOR_DECELE_RATIO (1.0f)
 /* single 3508 motor maximum speed, unit is rpm */
-#define MAX_WHEEL_RPM 8500 //8347rpm = 3500mm/s
+#define MAX_WHEEL_RPM 600 //8347rpm = 3500mm/s
 /* chassis maximum translation speed, unit is mm/s */
-#define MAX_CHASSIS_VX_SPEED 3300 //8000rpm
-#define MAX_CHASSIS_VY_SPEED 3300
+#define MAX_CHASSIS_VX_SPEED 330 //8000rpm
+#define MAX_CHASSIS_VY_SPEED 330
 /* chassis maximum rotation speed, unit is degree/s */
 #define MAX_CHASSIS_VW_SPEED 300 //5000rpm
 
-#define MOTOR_ENCODER_ACCURACY 8192.0f
+#define MOTOR_ENCODER_ACCURACY 200.0f
 
 /**
   * @brief  infantry structure configuration information
