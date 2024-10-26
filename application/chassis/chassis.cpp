@@ -4,11 +4,19 @@
 MOTOR_ASSIGN(lft_frt, 34, 35, 12, 18, 31);
 MOTOR_ASSIGN(rgt_frt, 37, 36, 8, 19, 38);
 MOTOR_ASSIGN(lft_rr, 43, 42, 9, 3, 49);
-MOTOR_ASSIGN(rgt_rr, PIN_A4, PIN_A5, 5, 2, 23);
-motor_device_t motor_list[4] = {&lft_frt, &rgt_frt, &lft_rr, &rgt_rr};
+MOTOR_ASSIGN(rgt_rr, PIN_A4, PIN_A5, 5, 2, PIN_A1);
+
+motor_device_t motor_list[4] = {&rgt_frt, &lft_frt, &lft_rr, &rgt_rr};
 
 void chassis_init(chassis_t chassis, struct pid_param param)
 {
+
+    chassis->mecanum.param.wheel_perimeter = PERIMETER;
+    chassis->mecanum.param.wheeltrack = WHEELTRACK;
+    chassis->mecanum.param.wheelbase = WHEELBASE;
+    chassis->mecanum.param.rotate_x_offset = ROTATE_X_OFFSET;
+    chassis->mecanum.param.rotate_y_offset = ROTATE_Y_OFFSET;
+
     for (int i = 0; i < 4; i++)
     {
         // register motor
@@ -18,6 +26,7 @@ void chassis_init(chassis_t chassis, struct pid_param param)
         // initialize PID
         pid_struct_init(&chassis->motor_pid[i], param.max_out, param.integral_limit, param.p, param.i, param.d);
     }
+
 }
 
 void chassis_calculate(chassis_t chassis)
@@ -55,10 +64,25 @@ void chassis_calculate(chassis_t chassis)
         pdata = motor_get_data(chassis->motor[i]);
         wheel_fbd[i].total_ecd = pdata->total_angle;
         wheel_fbd[i].speed_rpm = pdata->speed_rpm;
+                
+        Serial.print("Wheel "); Serial.print(i);
+        Serial.print(" SpeedRPM = ");
+        Serial.print(wheel_fbd[i].speed_rpm);
+        Serial.print(", TargetRPM = ");
+        Serial.println(chassis->mecanum.wheel_rpm[i]);
+
 
         motor_out = pid_calculate(&chassis->motor_pid[i], pdata->speed_rpm, chassis->mecanum.wheel_rpm[i]);
+        
+        // Serial.print("SetDuty = ");
+        // Serial.println((int16_t)motor_out);
+
+        // Serial.print("WheelRPM = ");
+        // Serial.println((int)chassis->mecanum.wheel_rpm[i]);
+
         motor_set_duty(chassis->motor[i], (int16_t)motor_out);
     }
+    // Serial.println(wheel_fbd[0].total_ecd);
 
     mecanum_position_measure(&(chassis->mecanum), wheel_fbd);
 
@@ -75,6 +99,10 @@ void chassis_set_speed(chassis_t chassis, float vx, float vy, float vw)
     chassis->mecanum.speed.vx = vx;
     chassis->mecanum.speed.vy = vy;
     chassis->mecanum.speed.vw = vw;
+    
+    // Serial.print("Target vx = "); Serial.println(chassis->mecanum.speed.vx);
+    // Serial.print("Target vy = "); Serial.println(chassis->mecanum.speed.vy);
+    // Serial.print("Target vw = "); Serial.println(chassis->mecanum.speed.vw);
 }
 
 

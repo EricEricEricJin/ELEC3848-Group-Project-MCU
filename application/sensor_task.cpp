@@ -29,7 +29,6 @@ void sensor_loop() {
     measure_distance();
     measure_angle();
     INA226_measure();
-    delay(1000);
 }
 
 void measure_distance() {

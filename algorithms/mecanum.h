@@ -51,9 +51,9 @@
 #define MAX_CHASSIS_VX_SPEED 330 //8000rpm
 #define MAX_CHASSIS_VY_SPEED 330
 /* chassis maximum rotation speed, unit is degree/s */
-#define MAX_CHASSIS_VW_SPEED 300 //5000rpm
+#define MAX_CHASSIS_VW_SPEED 1440 // 240rpm
 
-#define MOTOR_ENCODER_ACCURACY 200.0f
+#define MOTOR_ENCODER_ACCURACY 90.0f  // wtf is
 
 /**
   * @brief  infantry structure configuration information

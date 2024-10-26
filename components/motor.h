@@ -7,6 +7,7 @@
 typedef struct motor_data *motor_data_t;
 typedef struct motor_device *motor_device_t;
 
+// #define ECD_TICKS (90)
 #define ECD_TICKS (200)
 #define MOTOR_DUTY_MAX (255)
 #define MOTOR_NAME_MAX_LEN (32) 
@@ -19,8 +20,8 @@ struct motor_device NAME = {                                        \
     .pin_ecd_A = PIN_A, .pin_ecd_B = PIN_B, .ecd_isr = isr_##NAME   \
 };                                                                  \
 void isr_##NAME(void) {                                             \
-    if(digitalRead(NAME.pin_ecd_A)) NAME.data.total_ecd--;          \
-    else NAME.data.total_ecd++;                                     \
+    if(digitalRead(NAME.pin_ecd_B)) NAME.data.total_ecd++;          \
+    else NAME.data.total_ecd--;                                     \
 }
 
 struct motor_data

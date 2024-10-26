@@ -5,22 +5,13 @@
  * of this program, and changing it is allowed as long as the name is changed.
  *****************************************************************************/
 
-#ifndef __GROUND_CMD_H__
-#define __GROUND_CMD_H__
+#ifndef __CHASSIS_CMD_H__
+#define __CHASSIS_CMD_H__
 
 #include <time.h>
 #include <stdint.h>
 
 typedef struct chassis_cmd *chassis_cmd_t;
-
-#define CMD_MAX_DELAY_MS (500)
-
-// enum
-// {
-//     OPMODE_MANUAL = 0,
-//     OPMODE_STABILIZE = 1,
-//     OPMODE_LOCK_ATT = 2,
-// };
 
 struct __attribute__((__packed__)) chassis_cmd
 {

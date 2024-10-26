@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <Arduino.h>
 
-#define COMM_SEND_MAX_NUM (128)
-#define COMM_RECV_MAX_NUM (128)
+#define COMM_SEND_MAX_NUM (16)
+#define COMM_RECV_MAX_NUM (16)
 typedef struct communication* communication_t;
 
 struct communication
