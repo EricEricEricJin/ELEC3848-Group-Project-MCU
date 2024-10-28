@@ -34,7 +34,10 @@ void chassis_loop()
 {
     // if (millis() > 5000)
     //     chassis_cmd.vx = 160;
+
+    // chassis_set_speed(&chassis, 100, 0, 0);
     shared_mem_get(MSG_CHASSISCMD, &chassis_cmd);
-    chassis_set_speed(&chassis, chassis_cmd.vx, chassis_cmd.vy, chassis_cmd.wz);
+    chassis_set_speed(&chassis, chassis_cmd.vx, chassis_cmd.vy, chassis_cmd.wz);   
     chassis_calculate(&chassis);
+
 }

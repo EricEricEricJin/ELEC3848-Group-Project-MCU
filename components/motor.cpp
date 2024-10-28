@@ -27,6 +27,7 @@ void motor_set_duty(motor_device_t motor_dev, int16_t duty)
 
 void motor_update_data(motor_device_t motor_dev)
 {
+    // Serial.print("ENTER UPDATE");
     motor_dev->data.ecd = motor_dev->data.total_ecd % ECD_TICKS;
     motor_dev->data.round_cnt = motor_dev->data.total_ecd / ECD_TICKS;
     motor_dev->data.total_angle = motor_dev->data.total_ecd * 360 / ECD_TICKS;
@@ -34,6 +35,7 @@ void motor_update_data(motor_device_t motor_dev)
     motor_dev->data.speed_rpm = ((long)(motor_dev->data.total_ecd - motor_dev->data.last_upd_total_ecd) * (60000000L / ECD_TICKS)) / (long)(micros() - motor_dev->data.last_upd_micros);
     motor_dev->data.last_upd_total_ecd = motor_dev->data.total_ecd;
     motor_dev->data.last_upd_micros = micros();
+    // Serial.print("EXIT UPDATE");
 }
 
 motor_data_t motor_get_data(motor_device_t motor_dev)

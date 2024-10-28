@@ -10,6 +10,7 @@
 int shared_mem_create(int id, size_t size);
 int shared_mem_update(int id, const void* pointer);
 int shared_mem_get(int id, void* dst);
+void* shared_mem_get_ptr(int id);
 int shared_mem_delete(int id);
 
 #endif

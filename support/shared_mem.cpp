@@ -54,6 +54,16 @@ int shared_mem_get(int id, void* dst)
     return -1;
 }
 
+void* shared_mem_get_ptr(int id)
+{
+    for (int i = 0; i < SHARED_MEM_MAX_OBJ; i++)
+    {
+        if (id_addr_table[i].id == id)
+            return id_addr_table[i].pointer;
+    }
+    return NULL;
+}
+
 int shared_mem_delete(int id)
 {
     for (int i = 0; i < SHARED_MEM_MAX_OBJ; i++)

@@ -69,7 +69,9 @@ void chassis_calculate(chassis_t chassis)
         Serial.print(" SpeedRPM = ");
         Serial.print(wheel_fbd[i].speed_rpm);
         Serial.print(", TargetRPM = ");
-        Serial.println(chassis->mecanum.wheel_rpm[i]);
+        Serial.print(chassis->mecanum.wheel_rpm[i]);
+        Serial.print(", TotalECD = ");
+        Serial.println(wheel_fbd[i].total_ecd);
 
 
         motor_out = pid_calculate(&chassis->motor_pid[i], pdata->speed_rpm, chassis->mecanum.wheel_rpm[i]);
