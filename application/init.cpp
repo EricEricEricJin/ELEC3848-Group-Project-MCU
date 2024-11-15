@@ -22,7 +22,7 @@ void task_setup()
 {
     communicate_setup();
     chassis_setup();
-    sensor_setup();
+    // sensor_setup();
 }
 
 void hw_loop()
@@ -41,7 +41,7 @@ void task_loop()
     communicate_loop();
     // Serial.println("communicate_loop done!");
     chassis_loop();
-    sensor_loop();
+    // sensor_loop();
 
     // Serial.print("Distance: ");
     // Serial.println(get_sensor_data()->distance);

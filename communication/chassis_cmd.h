@@ -1,10 +1,3 @@
-/******************************************************************************
- * Copyright (C) 2024 Eric Jin <https://github.com/ericericericjin>
- *
- * Everyone is permitted to copy and distribute verbatim or modified copies
- * of this program, and changing it is allowed as long as the name is changed.
- *****************************************************************************/
-
 #ifndef __CHASSIS_CMD_H__
 #define __CHASSIS_CMD_H__
 
@@ -13,8 +6,13 @@
 
 typedef struct chassis_cmd *chassis_cmd_t;
 
+typedef enum {
+    OP_FOLLOW, OP_DIRECT
+} op_mode_t;
+
 struct __attribute__((__packed__)) chassis_cmd
 {
+    uint8_t op_mode;
     int16_t vx, vy, wz; // mm/s or deg/s
 };
 
