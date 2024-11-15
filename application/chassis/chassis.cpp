@@ -31,32 +31,47 @@ void chassis_init(chassis_t chassis, struct pid_param param)
 
 void chassis_calculate(chassis_t chassis)
 {
-    static unsigned long last_time, period;
-    static uint8_t init_f = 0; // init flag
+    // static uint8_t init_f = 0; // init flag
+    // static unsigned long last_time, period;
 
     float motor_out;
     struct motor_data *pdata;
     struct mecanum_motor_fdb wheel_fbd[4];
 
-    if (!init_f)
+    float wheel_rpm[4];
+
+    // if (!init_f)
+    // {
+    //     // initial call
+    //     period = 0;
+    //     last_time = micros();
+    //     init_f = 1;
+    // }
+    // else 
+    // {
+    //     period = micros() - last_time;
+    //     last_time = micros();
+
+    //     chassis->mecanum.speed.vx += chassis->acc.ax * period / 1'000'000.0f;
+    //     chassis->mecanum.speed.vy += chassis->acc.ay * period / 1'000'000.0f;
+    //     chassis->mecanum.speed.vw += chassis->acc.wz * period / 1'000'000.0f;
+    // }
+
+    if (chassis->mode == CHASSIS_MODE_MECANUM)
     {
-        // initial call
-        period = 0;
-        last_time = micros();
-        init_f = 1;
+        mecanum_calculate(&(chassis->mecanum));
+        for (int i = 0; i < 4; i++)
+            wheel_rpm[i] = chassis->mecanum.wheel_rpm[i];
     }
-    else 
+    else if (chassis->mode == CHASSIS_MODE_TWOWHEEL)
     {
-        period = micros() - last_time;
-        last_time = micros();
-
-        chassis->mecanum.speed.vx += chassis->acc.ax * period / 1'000'000.0f;
-        chassis->mecanum.speed.vy += chassis->acc.ay * period / 1'000'000.0f;
-        chassis->mecanum.speed.vw += chassis->acc.wz * period / 1'000'000.0f;
+        wheel_rpm[1] = chassis->vleft;
+        wheel_rpm[2] = chassis->vleft;
+        wheel_rpm[0] = - chassis->vright;
+        wheel_rpm[3] = - chassis->vright;
     }
 
-    mecanum_calculate(&(chassis->mecanum));
-
+    // Send to motor
     for (int i = 0; i < 4; i++)
     {
         motor_update_data(chassis->motor[i]);
@@ -65,16 +80,16 @@ void chassis_calculate(chassis_t chassis)
         wheel_fbd[i].total_ecd = pdata->total_angle;
         wheel_fbd[i].speed_rpm = pdata->speed_rpm;
                 
-        Serial.print("Wheel "); Serial.print(i);
-        Serial.print(" SpeedRPM = ");
-        Serial.print(wheel_fbd[i].speed_rpm);
-        Serial.print(", TargetRPM = ");
-        Serial.print(chassis->mecanum.wheel_rpm[i]);
-        Serial.print(", TotalECD = ");
-        Serial.println(wheel_fbd[i].total_ecd);
+        // Serial.print("Wheel "); Serial.print(i);
+        // Serial.print(" SpeedRPM = ");
+        // Serial.print(wheel_fbd[i].speed_rpm);
+        // Serial.print(", TargetRPM = ");
+        // Serial.print(chassis->mecanum.wheel_rpm[i]);
+        // Serial.print(", TotalECD = ");
+        // Serial.println(wheel_fbd[i].total_ecd);
 
 
-        motor_out = pid_calculate(&chassis->motor_pid[i], pdata->speed_rpm, chassis->mecanum.wheel_rpm[i]);
+        motor_out = pid_calculate(&chassis->motor_pid[i], pdata->speed_rpm, wheel_rpm[i]);
         
         // Serial.print("SetDuty = ");
         // Serial.println((int16_t)motor_out);
@@ -88,6 +103,17 @@ void chassis_calculate(chassis_t chassis)
 
     mecanum_position_measure(&(chassis->mecanum), wheel_fbd);
 
+}
+
+void chassis_set_mode(chassis_t chassis, chassis_mode_t mode)
+{
+    chassis->mode = mode;
+}
+
+void chassis_set_twowheel(chassis_t chassis, float vleft, float vright)
+{
+    chassis->vleft = vleft;
+    chassis->vright = vright;
 }
 
 void chassis_gyro_update(chassis_t chassis, float yaw_angle, float yaw_rate)
@@ -108,12 +134,12 @@ void chassis_set_speed(chassis_t chassis, float vx, float vy, float vw)
 }
 
 
-void chassis_set_acc(chassis_t chassis, float ax, float ay, float wz)
-{
-    chassis->acc.ax = ax;
-    chassis->acc.ay = ay;
-    chassis->acc.wz = wz;
-}
+// void chassis_set_acc(chassis_t chassis, float ax, float ay, float wz)
+// {
+//     chassis->acc.ax = ax;
+//     chassis->acc.ay = ay;
+//     chassis->acc.wz = wz;
+// }
 
 void chassis_set_offset(chassis_t chassis, float offset_x, float offset_y)
 {

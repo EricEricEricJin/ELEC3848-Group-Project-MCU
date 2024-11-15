@@ -8,8 +8,8 @@ typedef struct follower* follower_t;
 typedef struct follower_info* follower_info_t;
 
 struct follower_info {
-    // int vx, vy, wz;
-    int wz;
+    float left, right;
+    // int wz;
     bool reached_end;
 };
 

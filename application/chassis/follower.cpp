@@ -22,6 +22,7 @@ void follower_calculate(follower_t follower)
 {
     line_sensor_t sensor;
     int error;
+    float pid_out;
 
     if (follower->head)
         sensor = &follower->sensor_rear;
@@ -30,17 +31,22 @@ void follower_calculate(follower_t follower)
 
     line_sensor_update(sensor);
     
-    error = line_sensor_get_error(sensor);
     if (line_sensor_get_stop(sensor))
     {
-        follower->info.wz = 0;
+        follower->info.left = 0;
+        follower->info.right = 0;
     }
     else 
     {
-        follower->info.wz = pid_calculate(&follower->pid, error, 0);
-    }   
-    Serial.print("Line error = ");
-    Serial.println(error);
+        error = line_sensor_get_error(sensor);
+        pid_out = pid_calculate(&follower->pid, error, 0);
+        Serial.print("PID out = ");
+        Serial.println(pid_out);
+        follower->info.left = 1 - pid_out;
+        follower->info.right = 1 + pid_out;
+    }
+    // Serial.print("Line error = ");
+    // Serial.println(error);
     
     // Serial.print("Line value = ");
     // Serial.println(line_sensor_get_value(&follower->sensor_front));

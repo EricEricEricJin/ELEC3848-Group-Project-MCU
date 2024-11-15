@@ -35,9 +35,11 @@ uint8_t line_sensor_get_value(line_sensor_t sensor)
 
 int line_sensor_get_error(line_sensor_t sensor)
 {
-    return (((sensor->value & 0b1000) >> 3) - ((sensor->value & 0b0001))) * 2 + 
-        (((sensor->value & 0b0100) >> 2) - ((sensor->value & 0b0010) >> 1));
-    // return ((sensor->value & 0b0100) >> 2) - ((sensor->value & 0b0010) >> 1);
+    int error;
+    error = (((sensor->value & 0b1000) >> 3) - ((sensor->value & 0b0001))) * 3;
+    if (error == 0)
+       error = ((sensor->value & 0b0100) >> 2) - ((sensor->value & 0b0010) >> 1);
+    return error;
 }
 
 bool line_sensor_get_stop(line_sensor_t sensor)

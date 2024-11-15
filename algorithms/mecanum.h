@@ -38,7 +38,7 @@
 #define WHEELBASE 166
 
 /* gimbal is relative to chassis center x axis offset(mm) */
-#define ROTATE_X_OFFSET 0
+#define ROTATE_X_OFFSET (-150)
 /* gimbal is relative to chassis center y axis offset(mm) */
 #define ROTATE_Y_OFFSET 0
 
