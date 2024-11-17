@@ -78,3 +78,8 @@ int communication_send(communication_t comm, uint8_t pkt_id, const void* data_pt
     
     return -1;
 }
+
+uint32_t communication_get_recv_time_ms(communication_t comm, uint8_t pkt_id)
+{
+    return comm->recv_time[pkt_id];
+}

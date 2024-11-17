@@ -32,6 +32,7 @@ void communication_loop(communication_t comm);
 int communication_send(communication_t comm, uint8_t pkt_id, const void* data_ptr, size_t len);
 int communication_register_recv(communication_t comm, uint8_t pkt_id, void* data_ptr, size_t len, recv_callback_t callback);
 
+uint32_t communication_get_recv_time_ms(communication_t comm, uint8_t pkt_id);
 
 uint16_t crc16(uint16_t crc, const void *buf, size_t size);
 

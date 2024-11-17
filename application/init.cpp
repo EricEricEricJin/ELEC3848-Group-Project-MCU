@@ -7,6 +7,9 @@
 #include "communicate_task.h"
 #include <Arduino.h>
 
+#include "sys.h"
+
+static sys_clock main_clock = {0};
 
 void hw_setup()
 {
@@ -56,6 +59,8 @@ void task_loop()
     // Serial.println(get_sensor_data()->max_voltage);
     // Serial.print("Maximum Current: ");
     // Serial.println(get_sensor_data()->max_current);
-    
-    delay(20);
+
+    delay_period_us(&main_clock, 20'000);
+    Serial.print("CPU UTIL =");
+    Serial.println(main_clock.cpu_util);
 }

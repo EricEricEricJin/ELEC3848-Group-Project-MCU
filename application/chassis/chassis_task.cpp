@@ -13,6 +13,10 @@
 
 #include "roboarm_protocol.h"
 
+#include "sys.h"
+
+#define CHASSIS_CMD_TIMEOUT_MS (500)
+
 const int LINE_FOLLOW_SPEED = 100;
 
 struct pid_param chassis_motor_param =
@@ -71,7 +75,7 @@ void chassis_setup()
     chassis_cmd.vy = 0;
     chassis_cmd.wz = 0;
     // chassis_enable(&chassis);
-    chassis_disable(&chassis);
+    // chassis_disable(&chassis);
 
     // initialize line follower
     follower_init(&follower, line_follow_param);
@@ -81,34 +85,39 @@ void chassis_setup()
 
 void chassis_loop()
 {    
-    float vx, vy, wz;
     float vleft, vright;
-
-    Serial.println(chassis_cmd.vx);
+    float vx, vy, wz;
 
     //////////////////////////////
     // TEST LINE FOLLOW ONLY!   //
     //////////////////////////////
 
-    // chassis_cmd.op_mode = OP_FOLLOW;
-    // if (chassis_cmd.op_mode == OP_DIRECT)
-    // {
-    //     chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
-    //     vx = chassis_cmd.vx;
-    //     vy = chassis_cmd.vy;
-    //     wz = chassis_cmd.wz;
-    //     chassis_set_speed(&chassis, vx, vy, wz);   
-    // }
-    // else if (chassis_cmd.op_mode == OP_FOLLOW)
-    // {
-    //     chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
-    //     follower_calculate(&follower);
-    //     vleft = LINE_FOLLOW_SPEED * follower_get_info(&follower)->left;
-    //     vright = LINE_FOLLOW_SPEED * follower_get_info(&follower)->right;
-    //     chassis_set_twowheel(&chassis, vleft, vright);
-    // }
+    if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD) > CHASSIS_CMD_TIMEOUT_MS)
+    {
+        chassis_disable(&chassis);
+    }
+    else
+    {
+        chassis_enable(&chassis);
+        if (chassis_cmd.op_mode == OP_DIRECT)
+        {
+            chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
+            vx = chassis_cmd.vx;
+            vy = chassis_cmd.vy;
+            wz = chassis_cmd.wz;
+            chassis_set_speed(&chassis, vx, vy, wz);   
+        }
+        else if (chassis_cmd.op_mode == OP_FOLLOW)
+        {
+            chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
+            follower_calculate(&follower);
+            vleft = LINE_FOLLOW_SPEED * follower_get_info(&follower)->left;
+            vright = LINE_FOLLOW_SPEED * follower_get_info(&follower)->right;
+            chassis_set_twowheel(&chassis, vleft, vright);
+        }
+    }
 
-    // chassis_calculate(&chassis);
+    chassis_calculate(&chassis);
 
     // todo: send back data
 }
