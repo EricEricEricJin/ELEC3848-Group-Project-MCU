@@ -1,2 +1,0 @@
-#define MSG_SENSORDATA (0)
-#define MSG_CHASSISCMD (1)

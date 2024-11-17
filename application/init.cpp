@@ -4,13 +4,14 @@
 
 #include "chassis_task.h"
 #include "sensor_task.h"
-#include "communicate.h"
+#include "communicate_task.h"
 #include <Arduino.h>
 
 
 void hw_setup()
 {
     Serial.begin(115200);
+    Serial2.begin(115200);
     Serial3.begin(115200);
 }
 

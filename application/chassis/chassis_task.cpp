@@ -3,11 +3,15 @@
 #include "motor.h"
 #include "chassis.h"
 #include "shared_mem.h"
-#include "msg_id.h"
 #include "pid.h"
-#include "chassis_cmd.h"
+#include "chassis_protocol.h"
+#include "app_cfg.h"
+
+#include "communicate_task.h"
 
 #include "follower.h"
+
+#include "roboarm_protocol.h"
 
 const int LINE_FOLLOW_SPEED = 100;
 
@@ -32,19 +36,42 @@ struct pid_param line_follow_param =
 };
 
 struct chassis chassis;
-struct chassis_cmd chassis_cmd;
 
 struct follower follower;
 
+struct chassis_cmd chassis_cmd;
+struct roboarm_cmd roboarm_cmd;
+struct sensor_info sensor_info;
+
+void forward_roboarm_cmd()
+{
+    communication_send(&com_S3, ROBOARM_CMD_ID, &roboarm_cmd, sizeof(roboarm_cmd));
+}
+
+void forward_sensor_info()
+{
+    communication_send(&com_S2, SENSOR_INFO_ID, &sensor_info, sizeof(sensor_info));
+}
+
 void chassis_setup()
 {
+    // initialize communication
+
+    // route roboarm command
+    communication_register_recv(&com_S2, ROBOARM_CMD_ID, &roboarm_cmd, sizeof(roboarm_cmd), (recv_callback_t)&forward_roboarm_cmd);
+    // route sensor info
+    communication_register_recv(&com_S3, SENSOR_INFO_ID, &sensor_info, sizeof(sensor_info), (recv_callback_t)&forward_sensor_info);
+    // chassis cmd
+    communication_register_recv(&com_S2, CHASSIS_CMD, &chassis_cmd, sizeof(chassis_cmd), NULL);
+
     // initialize chassis
     chassis_init(&chassis, chassis_motor_param);
     chassis_set_offset(&chassis, ROTATE_X_OFFSET, ROTATE_Y_OFFSET);
     chassis_cmd.vx = 0;
     chassis_cmd.vy = 0;
     chassis_cmd.wz = 0;
-    chassis_enable(&chassis);
+    // chassis_enable(&chassis);
+    chassis_disable(&chassis);
 
     // initialize line follower
     follower_init(&follower, line_follow_param);
@@ -53,33 +80,35 @@ void chassis_setup()
 }
 
 void chassis_loop()
-{
-    shared_mem_get(MSG_CHASSISCMD, &chassis_cmd);
-    
+{    
     float vx, vy, wz;
     float vleft, vright;
 
+    Serial.println(chassis_cmd.vx);
+
     //////////////////////////////
     // TEST LINE FOLLOW ONLY!   //
-    chassis_cmd.op_mode = OP_FOLLOW;
     //////////////////////////////
 
-    if (chassis_cmd.op_mode == OP_DIRECT)
-    {
-        chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
-        vx = chassis_cmd.vx;
-        vy = chassis_cmd.vy;
-        wz = chassis_cmd.wz;
-        chassis_set_speed(&chassis, vx, vy, wz);   
-    }
-    else if (chassis_cmd.op_mode == OP_FOLLOW)
-    {
-        chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
-        follower_calculate(&follower);
-        vleft = LINE_FOLLOW_SPEED * follower_get_info(&follower)->left;
-        vright = LINE_FOLLOW_SPEED * follower_get_info(&follower)->right;
-        chassis_set_twowheel(&chassis, vleft, vright);
-    }
+    // chassis_cmd.op_mode = OP_FOLLOW;
+    // if (chassis_cmd.op_mode == OP_DIRECT)
+    // {
+    //     chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
+    //     vx = chassis_cmd.vx;
+    //     vy = chassis_cmd.vy;
+    //     wz = chassis_cmd.wz;
+    //     chassis_set_speed(&chassis, vx, vy, wz);   
+    // }
+    // else if (chassis_cmd.op_mode == OP_FOLLOW)
+    // {
+    //     chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
+    //     follower_calculate(&follower);
+    //     vleft = LINE_FOLLOW_SPEED * follower_get_info(&follower)->left;
+    //     vright = LINE_FOLLOW_SPEED * follower_get_info(&follower)->right;
+    //     chassis_set_twowheel(&chassis, vleft, vright);
+    // }
 
-    chassis_calculate(&chassis);
+    // chassis_calculate(&chassis);
+
+    // todo: send back data
 }

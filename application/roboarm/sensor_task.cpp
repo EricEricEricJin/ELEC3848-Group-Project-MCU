@@ -6,9 +6,6 @@
 
 #include <Adafruit_SSD1306.h>
 
-#include "shared_mem.h"
-#include "msg_id.h"
-
 #define echoPin 22  // PA0
 #define trigPin 24  // PA2
 
@@ -55,7 +52,7 @@ void sensor_loop() {
     INA226_measure();
     display_data();
 
-    shared_mem_update(MSG_SENSORDATA, &sensorData);
+    // shared_mem_update(MSG_SENSORDATA, &sensorData);
 }
 
 

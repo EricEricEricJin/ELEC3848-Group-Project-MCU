@@ -1,5 +1,5 @@
-#ifndef __CHASSIS_CMD_H__
-#define __CHASSIS_CMD_H__
+#ifndef __CHASSIS_PROTOCOL_H__
+#define __CHASSIS_PROTOCOL_H__
 
 #include <time.h>
 #include <stdint.h>
@@ -15,5 +15,13 @@ struct __attribute__((__packed__)) chassis_cmd
     uint8_t op_mode;
     int16_t vx, vy, wz; // mm/s or deg/s
 };
+
+struct __attribute__((__packed__)) chassis_fdbk
+{
+    uint8_t op_mode;
+    int16_t vx, vy, wz; // mm/s or deg/s
+};
+
+
 
 #endif

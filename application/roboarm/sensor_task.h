@@ -1,5 +1,5 @@
-#ifndef __sensor_TASK_H__
-#define __sensor_TASK_H__
+#ifndef __SENSOR_TASK_H__
+#define __SENSOR_TASK_H__
 
 
 struct SensorData {
