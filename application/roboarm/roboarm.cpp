@@ -22,6 +22,19 @@ void roboarm_set_arm(roboarm_t roboarm, float height, float angle)
     roboarm->servo_J2.write(ZERO_J2 + angle * DIR_J2);
 }
 
+void roboarm_set_raw(roboarm_t roboarm, int angle_J1, int angle_J2)
+{
+    roboarm->servo_J1.write(angle_J1);
+    roboarm->servo_J2.write(angle_J2);
+}
+
+
+void roboarm_clamp_set_raw(roboarm_t roboarm, int angle)
+{
+    roboarm->servo_clamp.write(angle);
+}
+
+
 void roboarm_arm_home(roboarm_t roboarm)
 {
     roboarm->servo_J1.write(HOME_J1);

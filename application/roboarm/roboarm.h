@@ -14,7 +14,7 @@
 #define HOME_J2 (90)
 
 #define DIR_J1 (1)
-#define DIR_J2 (-1)
+#define DIR_J2 (1)
 
 #define CLAMP_OPEN (180)
 #define CLAMP_CLOSE (70)
@@ -30,6 +30,10 @@ struct roboarm
 
 void roboarm_init(roboarm_t roboarm, uint8_t pin_J1, uint8_t pin_J2, uint8_t pin_clamp, uint8_t pin_sw);
 void roboarm_set_arm(roboarm_t roboarm, float height, float angle);
+
+void roboarm_set_raw(roboarm_t roboarm, int angle_J1, int angle_J2);
+void roboarm_clamp_set_raw(roboarm_t roboarm, int angle);
+
 void roboarm_arm_home(roboarm_t roboarm);
 
 void roboarm_clamp_open(roboarm_t roboarm);

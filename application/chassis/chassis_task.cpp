@@ -70,9 +70,9 @@ void chassis_setup()
     // initialize chassis
     chassis_init(&chassis, chassis_motor_param);
     chassis_set_offset(&chassis, ROTATE_X_OFFSET, ROTATE_Y_OFFSET);
-    chassis_cmd.vx = 0;
-    chassis_cmd.vy = 0;
-    chassis_cmd.wz = 0;
+    // chassis_cmd.vx = 0;
+    // chassis_cmd.vy = 0;
+    // chassis_cmd.wz = 0;
     // chassis_enable(&chassis);
     // chassis_disable(&chassis);
 
@@ -93,6 +93,7 @@ void chassis_loop()
 
     if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD_ID) > CHASSIS_CMD_TIMEOUT_MS)
     {
+        Serial.println("Timeout!");
         chassis_disable(&chassis);
     }
     else
@@ -113,6 +114,11 @@ void chassis_loop()
             vleft = LINE_FOLLOW_SPEED * follower_get_info(&follower)->left;
             vright = LINE_FOLLOW_SPEED * follower_get_info(&follower)->right;
             chassis_set_twowheel(&chassis, vleft, vright);
+        }
+        else 
+        {
+            chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
+            chassis_set_speed(&chassis, 0, 0, 0);
         }
     }
 

@@ -31,6 +31,15 @@ void roboarm_loop()
     {
         roboarm_set_arm(&roboarm, roboarm_cmd.height_mm, roboarm_cmd.angle_deg);
     }
+
     Serial.print("ROBOARM OP_MODE = ");
-    Serial.println(roboarm_cmd.op_mode);
+    Serial.print(roboarm_cmd.op_mode);
+
+    Serial.print(", HEIGHT = ");
+    Serial.print(roboarm_cmd.height_mm);
+
+    Serial.print(", ANGLE = ");
+    Serial.println(roboarm_cmd.angle_deg);
+    // roboarm_set_raw(&roboarm, 115, 75);
+
 }

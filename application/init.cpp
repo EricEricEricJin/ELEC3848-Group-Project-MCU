@@ -24,15 +24,15 @@ static sys_clock main_clock = {0};
 
 void hw_setup()
 {
-    pinMode(APP_SEL_PIN, INPUT_PULLUP);
-
     Serial.begin(115200);
     Serial2.begin(115200);
     Serial3.begin(115200);
+    delay(100);
 }
 
 void sys_setup()
 {
+    pinMode(APP_SEL_PIN, INPUT_PULLUP);
     app_select = digitalRead(APP_SEL_PIN);    
 }
 
@@ -40,9 +40,21 @@ void task_setup()
 {
     communicate_setup();
     if (app_select == APP_SEL_CHASSIS)
+    {
+        Serial.println("==========================");
+        Serial.println("|| APPLICATION: CHASSIS ||");
+        Serial.println("==========================");
+        Serial.println();
         chassis_setup();
+    }
     else if (app_select == APP_SEL_ROBOARM)
+    {
+        Serial.println("==========================");
+        Serial.println("|| APPLICATION: ROBOARM ||");
+        Serial.println("==========================");
+        Serial.println();
         roboarm_setup();
+    }
 }
 
 void hw_loop()
@@ -61,12 +73,12 @@ void task_loop()
     if (app_select == APP_SEL_CHASSIS)
     {
         chassis_loop();
-        delay_period_us(&main_clock, 20'000);
+        delay_period_us(&main_clock, 100'000);
     }
     else if (app_select == APP_SEL_ROBOARM)
     {
         roboarm_loop(); 
-        delay_period_us(&main_clock, 20'000);
+        delay_period_us(&main_clock, 100'000);
     }
 
     // Serial.println("Enter task_loop!");
