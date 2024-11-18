@@ -4,14 +4,13 @@
 #include "chassis.h"
 #include "shared_mem.h"
 #include "pid.h"
-#include "chassis_protocol.h"
+#include "protocol.h"
 #include "app_cfg.h"
 
 #include "communicate_task.h"
 
 #include "follower.h"
 
-#include "roboarm_protocol.h"
 
 #include "sys.h"
 
@@ -44,12 +43,12 @@ struct chassis chassis;
 struct follower follower;
 
 struct chassis_cmd chassis_cmd;
-struct roboarm_cmd roboarm_cmd;
+struct roboarm_cmd fwd_roboarm_cmd;
 struct sensor_info sensor_info;
 
 void forward_roboarm_cmd()
 {
-    communication_send(&com_S3, ROBOARM_CMD_ID, &roboarm_cmd, sizeof(roboarm_cmd));
+    communication_send(&com_S3, ROBOARM_CMD_ID, &fwd_roboarm_cmd, sizeof(fwd_roboarm_cmd));
 }
 
 void forward_sensor_info()
@@ -62,11 +61,11 @@ void chassis_setup()
     // initialize communication
 
     // route roboarm command
-    communication_register_recv(&com_S2, ROBOARM_CMD_ID, &roboarm_cmd, sizeof(roboarm_cmd), (recv_callback_t)&forward_roboarm_cmd);
+    communication_register_recv(&com_S2, ROBOARM_CMD_ID, &fwd_roboarm_cmd, sizeof(fwd_roboarm_cmd), (recv_callback_t)&forward_roboarm_cmd);
     // route sensor info
     communication_register_recv(&com_S3, SENSOR_INFO_ID, &sensor_info, sizeof(sensor_info), (recv_callback_t)&forward_sensor_info);
     // chassis cmd
-    communication_register_recv(&com_S2, CHASSIS_CMD, &chassis_cmd, sizeof(chassis_cmd), NULL);
+    communication_register_recv(&com_S2, CHASSIS_CMD_ID, &chassis_cmd, sizeof(chassis_cmd), NULL);
 
     // initialize chassis
     chassis_init(&chassis, chassis_motor_param);
@@ -92,14 +91,14 @@ void chassis_loop()
     // TEST LINE FOLLOW ONLY!   //
     //////////////////////////////
 
-    if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD) > CHASSIS_CMD_TIMEOUT_MS)
+    if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD_ID) > CHASSIS_CMD_TIMEOUT_MS)
     {
         chassis_disable(&chassis);
     }
     else
     {
         chassis_enable(&chassis);
-        if (chassis_cmd.op_mode == OP_DIRECT)
+        if (chassis_cmd.op_mode == CHASSIS_OP_DIRECT)
         {
             chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
             vx = chassis_cmd.vx;
@@ -107,7 +106,7 @@ void chassis_loop()
             wz = chassis_cmd.wz;
             chassis_set_speed(&chassis, vx, vy, wz);   
         }
-        else if (chassis_cmd.op_mode == OP_FOLLOW)
+        else if (chassis_cmd.op_mode == CHASSIS_OP_FOLLOW)
         {
             chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
             follower_calculate(&follower);
