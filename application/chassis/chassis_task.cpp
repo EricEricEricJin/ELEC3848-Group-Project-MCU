@@ -14,7 +14,7 @@
 
 #include "sys.h"
 
-#define CHASSIS_CMD_TIMEOUT_MS (500)
+#define CHASSIS_CMD_TIMEOUT_MS (1000)
 
 const int LINE_FOLLOW_SPEED = 100;
 
@@ -43,17 +43,20 @@ struct chassis chassis;
 struct follower follower;
 
 struct chassis_cmd chassis_cmd;
+struct chassis_fdbk chassis_fdbk;
 struct roboarm_cmd fwd_roboarm_cmd;
-struct sensor_info sensor_info;
+struct sensor_fdbk fwd_sensor_fdbk;
+
+struct chassis_info chassis_info;
 
 void forward_roboarm_cmd()
 {
     communication_send(&com_S3, ROBOARM_CMD_ID, &fwd_roboarm_cmd, sizeof(fwd_roboarm_cmd));
 }
 
-void forward_sensor_info()
+void forward_sensor_fdbk()
 {
-    communication_send(&com_S2, SENSOR_INFO_ID, &sensor_info, sizeof(sensor_info));
+    communication_send(&com_S2, SENSOR_FDBK_ID, &fwd_sensor_fdbk, sizeof(fwd_sensor_fdbk));
 }
 
 void chassis_setup()
@@ -63,7 +66,7 @@ void chassis_setup()
     // route roboarm command
     communication_register_recv(&com_S2, ROBOARM_CMD_ID, &fwd_roboarm_cmd, sizeof(fwd_roboarm_cmd), (recv_callback_t)&forward_roboarm_cmd);
     // route sensor info
-    communication_register_recv(&com_S3, SENSOR_INFO_ID, &sensor_info, sizeof(sensor_info), (recv_callback_t)&forward_sensor_info);
+    communication_register_recv(&com_S3, SENSOR_FDBK_ID, &fwd_sensor_fdbk, sizeof(fwd_sensor_fdbk), (recv_callback_t)&forward_sensor_fdbk);
     // chassis cmd
     communication_register_recv(&com_S2, CHASSIS_CMD_ID, &chassis_cmd, sizeof(chassis_cmd), NULL);
 
@@ -87,9 +90,28 @@ void chassis_loop()
     float vleft, vright;
     float vx, vy, wz;
 
+    chassis_enable(&chassis);
+
     //////////////////////////////
     // TEST LINE FOLLOW ONLY!   //
     //////////////////////////////
+    // chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
+
+    // follower_calculate(&follower);
+    // vleft = 100 * follower_get_info(&follower)->left;
+    // vright = 100 * follower_get_info(&follower)->right;
+    // chassis_set_twowheel(&chassis, vleft, vright);
+    
+    // Serial.print("VLEFT = ");
+    // Serial.print(vleft);
+    // Serial.print("VRGHT = ");
+    // Serial.println(vright);
+
+    // chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
+    // chassis_set_speed(&chassis, 100, 0, 0);
+
+    
+
 
     if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD_ID) > CHASSIS_CMD_TIMEOUT_MS)
     {
@@ -98,31 +120,58 @@ void chassis_loop()
     }
     else
     {
-        chassis_enable(&chassis);
+        if (chassis_cmd.op_mode == CHASSIS_OP_DISABLE)
+        {
+            chassis_disable(&chassis);
+        }
         if (chassis_cmd.op_mode == CHASSIS_OP_DIRECT)
         {
+            chassis_enable(&chassis);
             chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
+            
             vx = chassis_cmd.vx;
             vy = chassis_cmd.vy;
             wz = chassis_cmd.wz;
+            
             chassis_set_speed(&chassis, vx, vy, wz);   
         }
         else if (chassis_cmd.op_mode == CHASSIS_OP_FOLLOW)
         {
+            chassis_enable(&chassis);
             chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
+            
             follower_calculate(&follower);
-            vleft = LINE_FOLLOW_SPEED * follower_get_info(&follower)->left;
-            vright = LINE_FOLLOW_SPEED * follower_get_info(&follower)->right;
+            vleft = chassis_cmd.vx * follower_get_info(&follower)->left;
+            vright = chassis_cmd.vx * follower_get_info(&follower)->right;
+            
+            // Serial.print("VLEFT = ");
+            // Serial.print(vleft);
+            // Serial.print("VRGHT = ");
+            // Serial.println(vright);
+
             chassis_set_twowheel(&chassis, vleft, vright);
         }
         else 
         {
-            chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
-            chassis_set_speed(&chassis, 0, 0, 0);
+            chassis_disable(&chassis);
+            // chassis_set_mode(&chassis, CHASSIS_MODE_MECANUM);
+            // chassis_set_speed(&chassis, 0, 0, 0);
         }
     }
 
     chassis_calculate(&chassis);
+    chassis_get_info(&chassis, &chassis_info);
+
+
+    // Send chassis feedback
+    chassis_fdbk.line_sensor = follower_get_raw(&follower);
+    chassis_fdbk.line_stop = follower_get_info(&follower)->reached_end;
+    
+    chassis_fdbk.mec_angle_deg = chassis_info.angle_deg;
+    chassis_fdbk.mec_pos_x_mm = chassis_info.position_x_mm;
+    chassis_fdbk.mec_pos_x_mm = chassis_info.position_y_mm;
+
+    communication_send(&com_S2, CHASSIS_FDBK_ID, &chassis_fdbk, sizeof(chassis_fdbk));
 
     // todo: send back data
 }

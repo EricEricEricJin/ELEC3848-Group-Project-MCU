@@ -1,6 +1,7 @@
 #include "init.h"
 
 #include <HardwareSerial.h>
+#include <Wire.h>
 
 #include "chassis_task.h"
 #include "roboarm_task.h"
@@ -24,6 +25,7 @@ static sys_clock main_clock = {0};
 
 void hw_setup()
 {
+    Wire.begin();
     Serial.begin(115200);
     Serial2.begin(115200);
     Serial3.begin(115200);
@@ -69,7 +71,6 @@ void sys_loop()
 
 void task_loop()
 {
-    communicate_loop();
     if (app_select == APP_SEL_CHASSIS)
     {
         chassis_loop();
@@ -80,6 +81,7 @@ void task_loop()
         roboarm_loop(); 
         delay_period_us(&main_clock, 100'000);
     }
+    communicate_loop();
 
     // Serial.println("Enter task_loop!");
     // Serial.println("communicate_loop done!");

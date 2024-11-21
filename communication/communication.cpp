@@ -56,6 +56,8 @@ int communication_register_recv(communication_t comm, uint8_t pkt_id, void* data
     return 0;
 }
 
+const uint16_t COMM_EOF = 0xffd9;
+
 int communication_send(communication_t comm, uint8_t pkt_id, const void* data_ptr, size_t len)
 {
     if (data_ptr == NULL)
@@ -65,15 +67,24 @@ int communication_send(communication_t comm, uint8_t pkt_id, const void* data_pt
     uint16_t size = len;
     uint16_t crc;
 
-    memcpy(comm->raw_buf, &id, sizeof(id));
-    memcpy(comm->raw_buf + sizeof(id), &size, sizeof(size));
-    memcpy(comm->raw_buf + sizeof(id) + sizeof(size), data_ptr, size);
-
+    size_t ofst = 0;
+    memcpy(comm->raw_buf + ofst, &id, sizeof(id));
+    ofst += sizeof(id);
+    memcpy(comm->raw_buf + ofst, &size, sizeof(size));
+    ofst += sizeof(size);
+    memcpy(comm->raw_buf + ofst, data_ptr, size);
     crc = crc16(0xffff, comm->raw_buf, size + sizeof(id) + sizeof(size));
-    memcpy(comm->raw_buf + sizeof(id) + sizeof(size) + size, &crc, sizeof(crc));
+    
+    ofst += size;
+    memcpy(comm->raw_buf + ofst, &crc, sizeof(crc));
+    
+    // set EOF
+    ofst += sizeof(crc);
+    memcpy(comm->raw_buf + ofst, &COMM_EOF, sizeof(COMM_EOF));
+    
+    ofst += sizeof(COMM_EOF);
 
-    size_t whole_size = sizeof(id) + sizeof(size) + size + sizeof(crc);
-    if (comm->serial->write((char*)comm->raw_buf, whole_size) == whole_size)
+    if (comm->serial->write((char*)comm->raw_buf, ofst) == ofst)
         return 0;
     
     return -1;

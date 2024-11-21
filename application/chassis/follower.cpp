@@ -35,16 +35,19 @@ void follower_calculate(follower_t follower)
     {
         follower->info.left = 0;
         follower->info.right = 0;
+        follower->info.reached_end = true;
     }
     else 
     {
         error = line_sensor_get_error(sensor);
         pid_out = pid_calculate(&follower->pid, error, 0);
-        Serial.print("PID out = ");
-        Serial.println(pid_out);
+        // Serial.print("PID out = ");
+        // Serial.println(pid_out);
         follower->info.left = 1 - pid_out;
         follower->info.right = 1 + pid_out;
+        follower->info.reached_end = false;
     }
+    // follower->info.state_front_rear = (line_sensor_get_value(&follower->sensor_front) << 4) | line_sensor_get_value(&follower->sensor_rear);
     // Serial.print("Line error = ");
     // Serial.println(error);
     
@@ -53,9 +56,22 @@ void follower_calculate(follower_t follower)
      
 }
 
+
 follower_info_t follower_get_info(follower_t follower)
 {
     return &follower->info;
+}
+
+uint8_t follower_get_raw(follower_t follower)
+{
+    line_sensor_t sensor;
+    if (follower->head)
+        sensor = &follower->sensor_rear;
+    else
+        sensor = &follower->sensor_front;
+
+    line_sensor_update(sensor);
+    return line_sensor_get_value(sensor);
 }
 
 void follower_set_head(follower_t follower, bool head)
