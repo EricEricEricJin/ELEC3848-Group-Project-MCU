@@ -104,8 +104,8 @@ uint8_t sensor_setup(sensors_t sensors) {
 
     status |= mpu_setup(sensors->mpu);
 
-    // Serial.print("Sensors initialize status = ");
-    // Serial.println(status);
+    Serial.print("Sensors initialize status = ");
+    Serial.println(status);
 
     status |= ina_setup(sensors->ina, 0.01, 4);
 
@@ -126,6 +126,8 @@ void sensor_update(sensors_t sensors)
     ina_measure(&sensors->info, sensors->ina);
     tof_measure(&sensors->info, sensors->tof);
     sensors->info.sw = digitalRead(sensors->sw_pin);
+    // Serial.print("TOF = ");
+    // Serial.println(sensors->info.tof_mm);
 }
 
 sensor_info_t sensor_get_info(sensors_t sensors)

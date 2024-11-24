@@ -12,6 +12,8 @@
 #define PIN_CLAMP (4)  // PG5
 #define PIN_SWITCH (48)  // PL1
 
+#define INDICATOR_PIN (28)  // PA6
+
 struct roboarm roboarm;
 struct roboarm_cmd roboarm_cmd;
 
@@ -21,12 +23,15 @@ struct sensors sensors;
 
 void roboarm_setup()
 {
+    pinMode(INDICATOR_PIN, OUTPUT);
+    digitalWrite(INDICATOR_PIN, 0);
+
     // initialize communication
     communication_register_recv(&com_S2, ROBOARM_CMD_ID, &roboarm_cmd, sizeof(roboarm_cmd), NULL);
     roboarm_init(&roboarm, PIN_JOINT1, PIN_JOINT2, PIN_CLAMP, PIN_SWITCH);
     
-    sensor_setup(&sensors);
-
+    if (sensor_setup(&sensors) == 0)
+        digitalWrite(INDICATOR_PIN, 1);
 }
 
 

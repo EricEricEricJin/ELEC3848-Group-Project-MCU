@@ -140,6 +140,7 @@ void chassis_loop()
             chassis_enable(&chassis);
             chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
             
+            follower_set_head(&follower, chassis_cmd.vx < 0);
             follower_calculate(&follower);
             vleft = chassis_cmd.vx * follower_get_info(&follower)->left;
             vright = chassis_cmd.vx * follower_get_info(&follower)->right;
