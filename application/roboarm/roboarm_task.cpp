@@ -29,29 +29,39 @@ void roboarm_setup()
 
 }
 
+
 void roboarm_loop()
 {
-
-    if (roboarm_cmd.op_mode == ROBOARM_OP_HOME)
+    roboarm_cmd.op_mode = ROBOARM_OP_HOME;
+    if (roboarm_cmd.op_mode == ROBOARM_OP_DISABLE)
     {
+        roboarm_disable(&roboarm);
+    }
+    else if (roboarm_cmd.op_mode == ROBOARM_OP_HOME)
+    {
+        roboarm_enable(&roboarm);
         roboarm_arm_home(&roboarm);
     }
     else if (roboarm_cmd.op_mode == ROBOARM_OP_HA)
     {
+        roboarm_enable(&roboarm);
         roboarm_set_arm(&roboarm, roboarm_cmd.height_mm, roboarm_cmd.angle_deg);
     }
 
-    Serial.print("ROBOARM OP_MODE = ");
-    Serial.print(roboarm_cmd.op_mode);
+    // Serial.print("ROBOARM OP_MODE = ");
+    // Serial.print(roboarm_cmd.op_mode);
 
-    Serial.print(", HEIGHT = ");
-    Serial.print(roboarm_cmd.height_mm);
+    // Serial.print(", HEIGHT = ");
+    // Serial.print(roboarm_cmd.height_mm);
 
-    Serial.print(", ANGLE = ");
-    Serial.println(roboarm_cmd.angle_deg);
-    // roboarm_set_raw(&roboarm, 115, 75);
+    // Serial.print(", ANGLE = ");
+    // Serial.println(roboarm_cmd.angle_deg);
+    // roboarm_set_raw(&roboarm, 90, 90);
+    
+    // roboarm_set_arm(&roboarm, 140, 0);
 
     // update sensors
+
     sensor_update(&sensors);
     sensor_info_t info = sensor_get_info(&sensors);
     

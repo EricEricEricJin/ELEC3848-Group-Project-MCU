@@ -165,7 +165,7 @@ void chassis_loop()
 
     // Send chassis feedback
     chassis_fdbk.line_sensor = follower_get_raw(&follower);
-    chassis_fdbk.line_stop = follower_get_info(&follower)->reached_end;
+    chassis_fdbk.line_stop = follower_get_end(&follower);
     
     chassis_fdbk.mec_angle_deg = chassis_info.angle_deg;
     chassis_fdbk.mec_pos_x_mm = chassis_info.position_x_mm;

@@ -62,6 +62,16 @@ follower_info_t follower_get_info(follower_t follower)
     return &follower->info;
 }
 
+bool follower_get_end(follower_t follower)
+{
+    line_sensor_t sensor;
+    if (follower->head)
+        sensor = &follower->sensor_rear;
+    else
+        sensor = &follower->sensor_front;
+    return line_sensor_get_stop(sensor);
+}
+
 uint8_t follower_get_raw(follower_t follower)
 {
     line_sensor_t sensor;

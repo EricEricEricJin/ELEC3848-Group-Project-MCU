@@ -24,10 +24,18 @@ static inline uint8_t ina_setup(INA226* ina, float r_ohm, float i_max)
 
 static inline uint8_t tof_setup(Adafruit_VL53L0X* tof)
 {
+    uint8_t ret = 0;
     if (tof->begin())
-        return 0;
+        ret |= 0;
     else
-        return 1;
+        ret |= 1;
+ 
+    if (tof->startRangeContinuous())
+        ret |= 0;
+    else
+        ret |= 1;
+    
+    return ret;
 }
 
 static inline void ina_measure(sensor_info_t info, INA226* ina)
@@ -46,12 +54,14 @@ static inline void mpu_measure(sensor_info_t info, MPU6050* mpu)
 
 static inline void tof_measure(sensor_info_t info, Adafruit_VL53L0X* tof)
 {
-    VL53L0X_RangingMeasurementData_t measure_data;
-    tof->rangingTest(&measure_data, false);
-    if (measure_data.RangeStatus == 0 && measure_data.RangeMilliMeter < 4000)
-        info->tof_mm = measure_data.RangeMilliMeter;
-    else
-        info->tof_mm = 0xffff;
+    if (tof->isRangeComplete())
+    {
+        info->tof_mm = tof->readRange();
+        // Serial.print("TOF = ");
+        // Serial.println(info->tof_mm);
+    }
+
+
 }
 
 // void display_data()
@@ -99,13 +109,13 @@ uint8_t sensor_setup(sensors_t sensors) {
 
     status |= ina_setup(sensors->ina, 0.01, 4);
 
-    // Serial.print("Sensors initialize status = ");
-    // Serial.println(status);
+    Serial.print("Sensors initialize status = ");
+    Serial.println(status);
 
     status |= tof_setup(sensors->tof);
 
-    // Serial.print("Sensors initialize status = ");
-    // Serial.println(status);
+    Serial.print("Sensors initialize status = ");
+    Serial.println(status);
 
     return status;
 }

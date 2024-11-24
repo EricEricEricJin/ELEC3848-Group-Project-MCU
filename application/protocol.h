@@ -37,8 +37,9 @@ struct __attribute__((__packed__)) chassis_fdbk
 
 typedef struct sensor_fdbk *sensor_fdbk_t;
 enum {
-    ROBOARM_OP_HOME = 0,
-    ROBOARM_OP_HA = 1
+    ROBOARM_OP_DISABLE = 0,
+    ROBOARM_OP_HOME = 1,
+    ROBOARM_OP_HA = 2
 };
 
 struct __attribute__((__packed__)) roboarm_cmd
