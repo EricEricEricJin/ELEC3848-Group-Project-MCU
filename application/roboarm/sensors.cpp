@@ -88,7 +88,8 @@ static inline void tof_measure(sensor_info_t info, Adafruit_VL53L0X* tof)
 // }
 
 uint8_t sensor_setup(sensors_t sensors) {
-    sensors->sw_pin = 25;    // PA3
+    // sensors->sw_pin = 25;    // PA3
+    // pinMode(sensors->sw_pin, INPUT_PULLUP);
 
     sensors->tof = new Adafruit_VL53L0X();
     sensors->ina = new INA226();
@@ -97,7 +98,6 @@ uint8_t sensor_setup(sensors_t sensors) {
     uint8_t status = 0;
     Serial.println("Initializing Sensors:");
 
-    pinMode(sensors->sw_pin, INPUT_PULLUP);
     
     // Serial.print("Sensors initialize status = ");
     // Serial.println(status);
@@ -125,7 +125,7 @@ void sensor_update(sensors_t sensors)
     mpu_measure(&sensors->info, sensors->mpu);
     ina_measure(&sensors->info, sensors->ina);
     tof_measure(&sensors->info, sensors->tof);
-    sensors->info.sw = digitalRead(sensors->sw_pin);
+    // sensors->info.sw = digitalRead(sensors->sw_pin);
     // Serial.print("TOF = ");
     // Serial.println(sensors->info.tof_mm);
 }

@@ -78,7 +78,7 @@ void roboarm_loop()
     sensor_fdbk.current_mA = info->ina_amp * 1000;
 
     sensor_fdbk.distance_mm = info->tof_mm;
-    sensor_fdbk.is_holding = info->sw;
+    sensor_fdbk.is_holding = roboarm_clamp_get_sw(&roboarm);
 
     communication_send(&com_S2, SENSOR_FDBK_ID, &sensor_fdbk, sizeof(sensor_fdbk));
 

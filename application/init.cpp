@@ -11,6 +11,8 @@
 
 #include "sys.h"
 
+#include <avr/wdt.h>
+
 #define APP_SEL_PIN (25)    // PA3
 
 enum {

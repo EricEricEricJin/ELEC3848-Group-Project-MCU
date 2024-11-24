@@ -8,6 +8,7 @@ void roboarm_init(roboarm_t roboarm, uint8_t pin_J1, uint8_t pin_J2, uint8_t pin
     roboarm->pin_J1 = pin_J1;
     roboarm->pin_J2 = pin_J2;
     roboarm->pin_clamp = pin_clamp;
+    roboarm->pin_sw = pin_sw;
 
     roboarm->servo_J1.write(ZERO_J1);
     roboarm->servo_J2.write(ZERO_J2);

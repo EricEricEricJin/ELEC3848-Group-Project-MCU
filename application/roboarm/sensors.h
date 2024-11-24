@@ -13,7 +13,7 @@ struct sensor_info {
     float mpu_angleX, mpu_angleY, mpu_angleZ;
     float ina_volt, ina_amp;
     uint16_t tof_mm;
-    bool sw;
+    // bool sw;
 };
 
 
