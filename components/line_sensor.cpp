@@ -13,19 +13,19 @@ void line_sensor_register(line_sensor_t sensor)
     pinMode(sensor->pin_3, INPUT_PULLUP);
     
     Serial.print("Registered ");
-    Serial.println(sensor->pin_0);
+    // Serial.println(sensor->pin_0);
 
     sensor->value = 0;
 }
 
 void line_sensor_update(line_sensor_t sensor)
 {
-    Serial.print("Line update! value =");
+    // Serial.print("Line update! value =");
     sensor->value = (digitalRead(sensor->pin_3) << 3) |
                     (digitalRead(sensor->pin_2) << 2) |
                     (digitalRead(sensor->pin_1) << 1) |
                     (digitalRead(sensor->pin_0));
-    Serial.println(sensor->value);
+    // Serial.println(sensor->value);
 }
 
 uint8_t line_sensor_get_value(line_sensor_t sensor)

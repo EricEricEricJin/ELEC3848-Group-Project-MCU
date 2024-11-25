@@ -115,7 +115,7 @@ void chassis_loop()
 
     if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD_ID) > CHASSIS_CMD_TIMEOUT_MS)
     {
-        Serial.println("Timeout!");
+        // Serial.println("Timeout!");
         chassis_disable(&chassis);
     }
     else
