@@ -23,6 +23,11 @@ void unpack(communication_t comm, const void* ptr, size_t len)
     uint16_t size;
     uint16_t crc, calc_crc;
 
+    if (sizeof(id) + sizeof(size) + size + sizeof(crc) != len)
+    {
+        return;
+    }
+    
     // Receive
     // Serial.print("Received COM = ");
     // Serial.println((uint8_t)(&comm->serial));
@@ -30,7 +35,6 @@ void unpack(communication_t comm, const void* ptr, size_t len)
     memcpy(&size, ptr + sizeof(id), sizeof(size));
     memcpy(&crc, ptr + sizeof(id) + sizeof(size) + size, sizeof(crc));
     calc_crc = crc16(0xffff, ptr, size + sizeof(id) + sizeof(size));
-    
     
 
     if (id < COMM_RECV_MAX_NUM && comm->recv_buf[id] != NULL && comm->recv_len[id] == size && calc_crc == crc)

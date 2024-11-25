@@ -9,11 +9,11 @@ void follower_init(follower_t follower, struct pid_param param)
     follower->sensor_front.pin_3 = 48;  // PL1
     line_sensor_register(&follower->sensor_front);
     
-    // follower->sensor_rear.pin_0 = PG0;
-    // follower->sensor_rear.pin_1 = PG1;
-    // follower->sensor_rear.pin_2 = PC4;
-    // follower->sensor_rear.pin_3 = PC5;
-    // line_sensor_register(&follower->sensor_rear);
+    follower->sensor_rear.pin_0 = 33;   // PC4
+    follower->sensor_rear.pin_1 = 32;   // PC5
+    follower->sensor_rear.pin_2 = 30;   // PC7
+    follower->sensor_rear.pin_3 = 29;   // PA7
+    line_sensor_register(&follower->sensor_rear);
 
     pid_struct_init(&follower->pid, param.max_out, param.integral_limit, param.p, param.i, param.d);
 }
