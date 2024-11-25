@@ -73,15 +73,17 @@ void sys_loop()
 
 void task_loop()
 {
+    // communicate
+
     if (app_select == APP_SEL_CHASSIS)
     {
         chassis_loop();
-        delay_period_us(&main_clock, 100'000);
+        delay_period_us(&main_clock, 20'000);
     }
     else if (app_select == APP_SEL_ROBOARM)
     {
         roboarm_loop(); 
-        delay_period_us(&main_clock, 100'000);
+        delay_period_us(&main_clock, 20'000);
     }
     communicate_loop();
 

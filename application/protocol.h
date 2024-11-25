@@ -34,6 +34,8 @@ struct __attribute__((__packed__)) chassis_fdbk
     int16_t mec_angle_deg;
 };
 
+#define ROBOARM_GET_OP(x) ((x) & 0x7f)
+#define ROBOARM_GET_CLOSE(x) ((x) >> 7)
 
 typedef struct sensor_fdbk *sensor_fdbk_t;
 enum {

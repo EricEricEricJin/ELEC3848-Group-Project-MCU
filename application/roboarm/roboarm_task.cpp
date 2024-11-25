@@ -7,12 +7,16 @@
 
 #include <sensors.h>
 
+#include "sys.h"
+
 #define PIN_JOINT1 (6)  // PH3
 #define PIN_JOINT2 (7)  // PH4
 #define PIN_CLAMP (4)  // PG5
 #define PIN_SWITCH (48)  // PL1
 
 #define INDICATOR_PIN (28)  // PA6
+
+#define ROBOARM_CMD_TIMEOUT_MS (1000)
 
 struct roboarm roboarm;
 struct roboarm_cmd roboarm_cmd;
@@ -37,20 +41,48 @@ void roboarm_setup()
 
 void roboarm_loop()
 {
-    roboarm_cmd.op_mode = ROBOARM_OP_HOME;
-    if (roboarm_cmd.op_mode == ROBOARM_OP_DISABLE)
+
+    uint8_t op_mode = ROBOARM_GET_OP(roboarm_cmd.op_mode);
+    uint8_t close = ROBOARM_GET_CLOSE(roboarm_cmd.op_mode);
+
+    Serial.print("op_mode = ");
+    Serial.print(op_mode);
+    Serial.print(", close = ");
+    Serial.println(close);
+
+    if (get_time_ms() - communication_get_recv_time_ms(&com_S2, ROBOARM_CMD_ID) > ROBOARM_CMD_TIMEOUT_MS)
+    {
+        Serial.println("Timeout!");
+        roboarm_disable(&roboarm);
+    }
+    else if (op_mode == ROBOARM_OP_DISABLE)
     {
         roboarm_disable(&roboarm);
     }
-    else if (roboarm_cmd.op_mode == ROBOARM_OP_HOME)
+    else if (op_mode == ROBOARM_OP_HOME)
     {
         roboarm_enable(&roboarm);
         roboarm_arm_home(&roboarm);
+        roboarm_clamp_open(&roboarm);
     }
-    else if (roboarm_cmd.op_mode == ROBOARM_OP_HA)
+    else if (op_mode == ROBOARM_OP_HA)
     {
         roboarm_enable(&roboarm);
         roboarm_set_arm(&roboarm, roboarm_cmd.height_mm, roboarm_cmd.angle_deg);
+        
+        if (close)
+        {
+            roboarm_clamp_close(&roboarm);
+            // Serial.println("Close");
+        }
+        else 
+        {
+            roboarm_clamp_open(&roboarm);
+        }
+    }
+    else 
+    {
+        roboarm_disable(&roboarm);
     }
 
     // Serial.print("ROBOARM OP_MODE = ");
@@ -66,8 +98,10 @@ void roboarm_loop()
     // roboarm_set_arm(&roboarm, 140, 0);
 
     // update sensors
-
+    Serial.println("Update sensor...");
     sensor_update(&sensors);
+    Serial.println("Sensor updated...");
+
     sensor_info_t info = sensor_get_info(&sensors);
     
     sensor_fdbk.angleX_x10 = info->mpu_angleX * 10;
