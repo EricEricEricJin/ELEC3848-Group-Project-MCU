@@ -45,10 +45,10 @@ void roboarm_loop()
     uint8_t op_mode = ROBOARM_GET_OP(roboarm_cmd.op_mode);
     uint8_t close = ROBOARM_GET_CLOSE(roboarm_cmd.op_mode);
 
-    Serial.print("op_mode = ");
-    Serial.print(op_mode);
-    Serial.print(", close = ");
-    Serial.println(close);
+    // Serial.print("op_mode = ");
+    // Serial.print(op_mode);
+    // Serial.print(", close = ");
+    // Serial.println(close);
 
     if (get_time_ms() - communication_get_recv_time_ms(&com_S2, ROBOARM_CMD_ID) > ROBOARM_CMD_TIMEOUT_MS)
     {
@@ -98,9 +98,9 @@ void roboarm_loop()
     // roboarm_set_arm(&roboarm, 140, 0);
 
     // update sensors
-    Serial.println("Update sensor...");
+    // Serial.println("Update sensor...");
     sensor_update(&sensors);
-    Serial.println("Sensor updated...");
+    // Serial.println("Sensor updated...");
 
     sensor_info_t info = sensor_get_info(&sensors);
     

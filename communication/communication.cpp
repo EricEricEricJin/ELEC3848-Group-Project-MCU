@@ -23,25 +23,31 @@ void unpack(communication_t comm, const void* ptr, size_t len)
     uint16_t size;
     uint16_t crc, calc_crc;
 
-    if (sizeof(id) + sizeof(size) + size + sizeof(crc) != len)
-    {
+    if (len < sizeof(id) + sizeof(size) + sizeof(crc))
         return;
-    }
+
     
     // Receive
     // Serial.print("Received COM = ");
     // Serial.println((uint8_t)(&comm->serial));
     memcpy(&id, ptr, sizeof(id));
     memcpy(&size, ptr + sizeof(id), sizeof(size));
+
+    if (sizeof(id) + sizeof(size) + size + sizeof(crc) != len)
+    {
+        // Serial.println("ERR LEN");
+        return;
+    }
+
     memcpy(&crc, ptr + sizeof(id) + sizeof(size) + size, sizeof(crc));
     calc_crc = crc16(0xffff, ptr, size + sizeof(id) + sizeof(size));
     
+    // Serial.print("RECV ID =");
+    // Serial.println(id);
+    // Serial.println(size);
 
     if (id < COMM_RECV_MAX_NUM && comm->recv_buf[id] != NULL && comm->recv_len[id] == size && calc_crc == crc)
     {
-        // Serial.print("RECV ID =");
-        // Serial.println(id);
-        // Serial.println(size);
 
         memcpy(comm->recv_buf[id], ptr + sizeof(id) + sizeof(size), size);
         comm->recv_time[id] = get_time_ms();
@@ -86,24 +92,26 @@ bool communication_loop(communication_t comm)
             {
                 sof_idx = i;
             }
-            else if (nxt_two_bytes == COMM_EOF && sof_idx >= 0)
+            else if (nxt_two_bytes == COMM_EOF)
             {
                 eof_idx = i;
-
-                // Serial.print("SOF = ");
-                // Serial.print(sof_idx);
-                // Serial.print(", EOF = ");
-                // Serial.println(eof_idx);
-                
-                // for (int j = 0; j < (eof_idx - sof_idx); j++)
-                // {
-                //     Serial.print((uint8_t)raw_buf[sof_idx + j]);
-                //     Serial.print(" ");
-                // }
-                // Serial.println();
-                
-                unpack(comm, (const void*)&(raw_buf[sof_idx + 2]), eof_idx - sof_idx - 2);
-                sof_idx = -1;
+                if (sof_idx >= 0)
+                {
+                    // Serial.print("SOF = ");
+                    // Serial.print(sof_idx);
+                    // Serial.print(", EOF = ");
+                    // Serial.println(eof_idx);
+                    
+                    // for (int j = 0; j < (eof_idx - sof_idx); j++)
+                    // {
+                    //     Serial.print((uint8_t)raw_buf[sof_idx + j]);
+                    //     Serial.print(" ");
+                    // }
+                    // Serial.println();
+                    
+                    unpack(comm, (const void*)&(raw_buf[sof_idx + 2]), eof_idx - sof_idx - 2);
+                    sof_idx = -1;
+                }
             }
         }
         

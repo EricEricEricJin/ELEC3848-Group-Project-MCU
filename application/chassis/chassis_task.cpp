@@ -56,6 +56,7 @@ void forward_roboarm_cmd()
 
 void forward_sensor_fdbk()
 {
+    // Serial.println("FWDSENSOR!");
     communication_send(&com_S2, SENSOR_FDBK_ID, &fwd_sensor_fdbk, sizeof(fwd_sensor_fdbk));
 }
 
@@ -115,11 +116,13 @@ void chassis_loop()
 
     if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD_ID) > CHASSIS_CMD_TIMEOUT_MS)
     {
-        Serial.println("Timeout!");
+        // Serial.println("Timeout!");
         chassis_disable(&chassis);
     }
     else
     {
+        follower_set_head(&follower, chassis_cmd.vx < 0);
+        
         if (chassis_cmd.op_mode == CHASSIS_OP_DISABLE)
         {
             chassis_disable(&chassis);
@@ -140,7 +143,6 @@ void chassis_loop()
             chassis_enable(&chassis);
             chassis_set_mode(&chassis, CHASSIS_MODE_TWOWHEEL);
             
-            follower_set_head(&follower, chassis_cmd.vx < 0);
             follower_calculate(&follower);
             vleft = chassis_cmd.vx * follower_get_info(&follower)->left;
             vright = chassis_cmd.vx * follower_get_info(&follower)->right;
