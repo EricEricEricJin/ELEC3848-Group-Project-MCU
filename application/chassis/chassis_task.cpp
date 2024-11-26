@@ -51,6 +51,7 @@ struct chassis_info chassis_info;
 
 void forward_roboarm_cmd()
 {
+    // Serial.println("FWDRA!");
     communication_send(&com_S3, ROBOARM_CMD_ID, &fwd_roboarm_cmd, sizeof(fwd_roboarm_cmd));
 }
 
@@ -116,13 +117,14 @@ void chassis_loop()
 
     if (get_time_ms() - communication_get_recv_time_ms(&com_S2, CHASSIS_CMD_ID) > CHASSIS_CMD_TIMEOUT_MS)
     {
-        // Serial.println("Timeout!");
+        Serial.println("Timeout!");
         chassis_disable(&chassis);
     }
     else
     {
+        Serial.print("LOOP ");
         follower_set_head(&follower, chassis_cmd.vx < 0);
-        
+
         if (chassis_cmd.op_mode == CHASSIS_OP_DISABLE)
         {
             chassis_disable(&chassis);

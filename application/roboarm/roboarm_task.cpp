@@ -8,6 +8,7 @@
 #include <sensors.h>
 
 #include "sys.h"
+#include "my_math.h"
 
 #define PIN_JOINT1 (6)  // PH3
 #define PIN_JOINT2 (7)  // PH4
@@ -104,6 +105,8 @@ void roboarm_loop()
 
     sensor_info_t info = sensor_get_info(&sensors);
     
+
+
     sensor_fdbk.angleX_x10 = info->mpu_angleX * 10;
     sensor_fdbk.angleY_x10 = info->mpu_angleY * 10;
     sensor_fdbk.angleZ_x10 = info->mpu_angleZ * 10;
@@ -113,7 +116,8 @@ void roboarm_loop()
 
     sensor_fdbk.distance_mm = info->tof_mm;
     sensor_fdbk.is_holding = roboarm_clamp_get_sw(&roboarm);
-
+    
+    // Serial.print("LOOP ");
     communication_send(&com_S2, SENSOR_FDBK_ID, &sensor_fdbk, sizeof(sensor_fdbk));
 
 }

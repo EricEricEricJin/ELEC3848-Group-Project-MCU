@@ -1,8 +1,11 @@
 #include "communication.h"
 #include "sys.h"
 
-const uint16_t COMM_SOF = 0xffd8;
-const uint16_t COMM_EOF = 0xffd9;
+// const uint16_t COMM_SOF = 0xffd8;
+// const uint16_t COMM_EOF = 0xffd9;
+
+const uint16_t COMM_SOF = 0x807f;
+const uint16_t COMM_EOF = 0x8080;
 
 void communication_setup(communication_t comm, HardwareSerial* serial, size_t recv_max_bytes, size_t send_max_bytes)
 {
@@ -16,9 +19,9 @@ void communication_setup(communication_t comm, HardwareSerial* serial, size_t re
     comm->send_buf_max_bytes = send_max_bytes;
 }
 
-void unpack(communication_t comm, const void* ptr, size_t len)
+void unpack(communication_t comm, const void* ptr, int len)
 {
-    Serial.println("Unpack");
+    // Serial.println("Unpack");
     uint8_t id;
     uint16_t size;
     uint16_t crc, calc_crc;
@@ -35,7 +38,7 @@ void unpack(communication_t comm, const void* ptr, size_t len)
 
     if (sizeof(id) + sizeof(size) + size + sizeof(crc) != len)
     {
-        // Serial.println("ERR LEN");
+        Serial.println("ERR LEN");
         return;
     }
 
@@ -48,7 +51,6 @@ void unpack(communication_t comm, const void* ptr, size_t len)
 
     if (id < COMM_RECV_MAX_NUM && comm->recv_buf[id] != NULL && comm->recv_len[id] == size && calc_crc == crc)
     {
-
         memcpy(comm->recv_buf[id], ptr + sizeof(id) + sizeof(size), size);
         comm->recv_time[id] = get_time_ms();
         // call callback
@@ -57,7 +59,7 @@ void unpack(communication_t comm, const void* ptr, size_t len)
     }
     else 
     {
-        // Serial.println("ERROR!");
+        Serial.println("ERROR!");
         // comm->recv_flag[id] = 0;
     }
 }
@@ -67,10 +69,11 @@ bool communication_loop(communication_t comm)
     // Serial.println("CommLoop");
     if (int avail_bytes = comm->serial->available(); avail_bytes != 0) 
     {
+        // Serial.println("avail");
         size_t apped_len = avail_bytes + comm->raw_buf_idx;
         if (apped_len > comm->raw_buf_max_bytes)
         {
-            // overflow
+            Serial.println("Recv buf ovf!");
             return apped_len - comm->raw_buf_max_bytes;
         }
 

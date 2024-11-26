@@ -17,7 +17,7 @@
 #define DIR_J2 (1)
 
 #define CLAMP_OPEN (180)
-#define CLAMP_CLOSE (50)
+#define CLAMP_CLOSE (40)
 
 #define J1_LIM_LO (45)
 #define J1_LIM_HI (135)
@@ -34,6 +34,7 @@ struct roboarm
     bool enabled;
 
     int clamp_deg;
+    bool clamp_tight;
 };
 
 void roboarm_init(roboarm_t roboarm, uint8_t pin_J1, uint8_t pin_J2, uint8_t pin_clamp, uint8_t pin_sw);

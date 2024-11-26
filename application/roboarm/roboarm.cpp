@@ -14,6 +14,7 @@ void roboarm_init(roboarm_t roboarm, uint8_t pin_J1, uint8_t pin_J2, uint8_t pin
     roboarm->servo_J2.write(ZERO_J2);
     roboarm->servo_clamp.write(CLAMP_OPEN);
     roboarm->clamp_deg = CLAMP_OPEN;
+    roboarm->clamp_tight = false;
 
     // initialize switch
     pinMode(pin_sw, INPUT_PULLUP);
@@ -75,20 +76,35 @@ void roboarm_arm_home(roboarm_t roboarm)
 {
     roboarm->servo_J1.write(HOME_J1);
     roboarm->servo_J2.write(HOME_J2);
+    roboarm_clamp_set_raw(roboarm, CLAMP_OPEN);
 }
 
 void roboarm_clamp_open(roboarm_t roboarm)
 {
     roboarm->servo_clamp.write(CLAMP_OPEN);
     roboarm->clamp_deg = CLAMP_OPEN;
+    roboarm->clamp_tight = false;
 }
 
 void roboarm_clamp_close(roboarm_t roboarm)
 {
+    Serial.print("clamp deg = ");
+    Serial.println(roboarm->clamp_deg);
     // roboarm->servo_clamp.write(CLAMP_CLOSE);
-    if (roboarm->clamp_deg > CLAMP_CLOSE && !roboarm_clamp_get_sw(roboarm))
+    if (roboarm->clamp_deg > CLAMP_CLOSE)
     {
-        roboarm->servo_clamp.write(--roboarm->clamp_deg);
+        bool sw = roboarm_clamp_get_sw(roboarm);
+        if (!sw)
+        {
+            roboarm->servo_clamp.write(--roboarm->clamp_deg);
+            roboarm->clamp_tight = false;
+        }
+        else if (!roboarm->clamp_tight)
+        {
+            roboarm->clamp_deg -= 10;
+            roboarm->servo_clamp.write(roboarm->clamp_deg);
+            roboarm->clamp_tight = true;
+        }
     }
 }
 
