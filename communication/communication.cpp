@@ -21,7 +21,7 @@ void communication_setup(communication_t comm, HardwareSerial* serial, size_t re
 
 void unpack(communication_t comm, const void* ptr, int len)
 {
-    // Serial.println("Unpack");
+    Serial.println("Enter Unpack");
     uint8_t id;
     uint16_t size;
     uint16_t crc, calc_crc;
@@ -62,12 +62,13 @@ void unpack(communication_t comm, const void* ptr, int len)
         Serial.println("ERROR!");
         // comm->recv_flag[id] = 0;
     }
+    Serial.println("Exit Unpack");
 }
 
 bool communication_loop(communication_t comm)
 {
-    // Serial.println("CommLoop");
-    if (int avail_bytes = comm->serial->available(); avail_bytes != 0) 
+    int avail_bytes = comm->serial->available(); 
+    if (avail_bytes != 0) 
     {
         // Serial.println("avail");
         size_t apped_len = avail_bytes + comm->raw_buf_idx;
@@ -125,7 +126,6 @@ bool communication_loop(communication_t comm)
             comm->raw_buf_idx -= (eof_idx + 2);
         }
     }
-
 }
 
 /*

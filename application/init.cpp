@@ -74,17 +74,18 @@ void sys_loop()
 void task_loop()
 {
     // communicate
-
+    Serial.println("APP LOOP");
     if (app_select == APP_SEL_CHASSIS)
     {
         chassis_loop();
-        delay_period_us(&main_clock, 20'000);
+        delay_period_us(&main_clock, 20000);
     }
     else if (app_select == APP_SEL_ROBOARM)
     {
         roboarm_loop(); 
-        delay_period_us(&main_clock, 20'000);
+        delay_period_us(&main_clock, 20000);
     }
+    Serial.println("COM LOOP");
     communicate_loop();
 
     // Serial.println("Enter task_loop!");

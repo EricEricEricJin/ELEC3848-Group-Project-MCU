@@ -39,10 +39,10 @@ void roboarm_setup()
         digitalWrite(INDICATOR_PIN, 1);
 }
 
+uint32_t send_time;
 
 void roboarm_loop()
 {
-
     uint8_t op_mode = ROBOARM_GET_OP(roboarm_cmd.op_mode);
     uint8_t close = ROBOARM_GET_CLOSE(roboarm_cmd.op_mode);
 
@@ -99,12 +99,11 @@ void roboarm_loop()
     // roboarm_set_arm(&roboarm, 140, 0);
 
     // update sensors
-    // Serial.println("Update sensor...");
+    Serial.println("Update sensor...");
     sensor_update(&sensors);
-    // Serial.println("Sensor updated...");
+    Serial.println("Sensor updated...");
 
     sensor_info_t info = sensor_get_info(&sensors);
-    
 
 
     sensor_fdbk.angleX_x10 = info->mpu_angleX * 10;
@@ -116,8 +115,15 @@ void roboarm_loop()
 
     sensor_fdbk.distance_mm = info->tof_mm;
     sensor_fdbk.is_holding = roboarm_clamp_get_sw(&roboarm);
+
+    sensor_fdbk.pressure_hpa_x10 = info->pressure_pa / 10.0;
+    sensor_fdbk.temp_c_x100 = info->temp_c * 100;
     
-    // Serial.print("LOOP ");
-    communication_send(&com_S2, SENSOR_FDBK_ID, &sensor_fdbk, sizeof(sensor_fdbk));
+    Serial.println("APP LOOP MID");
+    if (get_time_ms() - send_time > 50)
+    {
+        communication_send(&com_S2, SENSOR_FDBK_ID, &sensor_fdbk, sizeof(sensor_fdbk));
+        send_time = get_time_ms();
+    }
 
 }

@@ -38,6 +38,21 @@ static inline uint8_t tof_setup(Adafruit_VL53L0X* tof)
     return ret;
 }
 
+static inline uint8_t bmp_setup(Adafruit_BMP280* bmp)
+{
+    uint8_t ret;
+    ret = bmp->begin(0x76, 0x60);
+    if (!ret)
+        return ret;
+    
+    bmp->setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+    return 0;
+}
+
 static inline void ina_measure(sensor_info_t info, INA226* ina)
 {
     info->ina_volt = ina->readBusVoltage();
@@ -60,8 +75,12 @@ static inline void tof_measure(sensor_info_t info, Adafruit_VL53L0X* tof)
         // Serial.print("TOF = ");
         // Serial.println(info->tof_mm);
     }
+}
 
-
+static inline void bmp_measure(sensor_info_t info, Adafruit_BMP280* bmp)
+{
+    info->temp_c = bmp->readTemperature();
+    info->pressure_pa = bmp->readPressure();
 }
 
 // void display_data()
@@ -92,8 +111,9 @@ uint8_t sensor_setup(sensors_t sensors) {
     // pinMode(sensors->sw_pin, INPUT_PULLUP);
 
     sensors->tof = new Adafruit_VL53L0X();
-    sensors->ina = new INA226();
-    sensors->mpu = new MPU6050(Wire);
+    // sensors->ina = new INA226();
+    // sensors->mpu = new MPU6050(Wire);
+    sensors->bmp = new Adafruit_BMP280();
     
     uint8_t status = 0;
     Serial.println("Initializing Sensors:");
@@ -102,17 +122,22 @@ uint8_t sensor_setup(sensors_t sensors) {
     // Serial.print("Sensors initialize status = ");
     // Serial.println(status);
 
-    status |= mpu_setup(sensors->mpu);
+    // status |= mpu_setup(sensors->mpu);
 
-    Serial.print("Sensors initialize status = ");
-    Serial.println(status);
+    // Serial.print("Sensors initialize status = ");
+    // Serial.println(status);
 
-    status |= ina_setup(sensors->ina, 0.01, 4);
+    // status |= ina_setup(sensors->ina, 0.01, 4);
 
-    Serial.print("Sensors initialize status = ");
-    Serial.println(status);
+    // Serial.print("Sensors initialize status = ");
+    // Serial.println(status);
 
     status |= tof_setup(sensors->tof);
+
+    Serial.print("Sensors initialize status = ");
+    Serial.println(status);
+
+    status |= bmp_setup(sensors->bmp);
 
     Serial.print("Sensors initialize status = ");
     Serial.println(status);
@@ -122,9 +147,11 @@ uint8_t sensor_setup(sensors_t sensors) {
 
 void sensor_update(sensors_t sensors) 
 {
-    mpu_measure(&sensors->info, sensors->mpu);
-    ina_measure(&sensors->info, sensors->ina);
+    // mpu_measure(&sensors->info, sensors->mpu);
+    // ina_measure(&sensors->info, sensors->ina);
     tof_measure(&sensors->info, sensors->tof);
+    
+    bmp_measure(&sensors->info, sensors->bmp);
     // sensors->info.sw = digitalRead(sensors->sw_pin);
     // Serial.print("TOF = ");
     // Serial.println(sensors->info.tof_mm);

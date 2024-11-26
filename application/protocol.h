@@ -62,6 +62,9 @@ struct __attribute__((__packed__)) sensor_fdbk
 
     uint16_t current_mA;
     uint16_t voltage_mV;
+
+    uint16_t pressure_hpa_x10;
+    int16_t temp_c_x100;
 };
 
 #endif

@@ -6,6 +6,8 @@
 #include <INA226.h>
 #include <MPU6050_light.h>
 
+#include "Adafruit_BMP280.h"
+
 typedef struct sensor_info* sensor_info_t;
 typedef struct sensors* sensors_t;
 
@@ -14,6 +16,7 @@ struct sensor_info {
     float ina_volt, ina_amp;
     uint16_t tof_mm;
     // bool sw;
+    float temp_c, pressure_pa;
 };
 
 
@@ -23,6 +26,7 @@ struct sensors
     Adafruit_VL53L0X* tof;
     INA226* ina;
     MPU6050* mpu;
+    Adafruit_BMP280* bmp;
     sensor_info info;
 };
 

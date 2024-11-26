@@ -17,7 +17,7 @@
 #define DIR_J2 (1)
 
 #define CLAMP_OPEN (180)
-#define CLAMP_CLOSE (40)
+#define CLAMP_CLOSE (20)
 
 #define J1_LIM_LO (45)
 #define J1_LIM_HI (135)

@@ -87,6 +87,8 @@ void chassis_setup()
 
 }
 
+uint32_t chassis_send_time;
+
 void chassis_loop()
 {    
     float vleft, vright;
@@ -176,7 +178,11 @@ void chassis_loop()
     chassis_fdbk.mec_pos_x_mm = chassis_info.position_x_mm;
     chassis_fdbk.mec_pos_x_mm = chassis_info.position_y_mm;
 
-    communication_send(&com_S2, CHASSIS_FDBK_ID, &chassis_fdbk, sizeof(chassis_fdbk));
+    if (get_time_ms() - chassis_send_time > 50)
+    {
+        communication_send(&com_S2, CHASSIS_FDBK_ID, &chassis_fdbk, sizeof(chassis_fdbk));
+        chassis_send_time = get_time_ms();
+    }
 
     // todo: send back data
 }
