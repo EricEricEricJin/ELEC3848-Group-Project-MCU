@@ -1,0 +1,187 @@
+
+\section{Techinical Details}
+\subsection{Communication among Jetson and Arduino boards}
+We defined our customized protocol as shown in Table \ref{tab:com_protocol}.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|p{1in}|p{1in}|p{3in}|}
+        \hline 
+        Offset (Byte) & Length (Byte) & Content \\ \hline 
+        0 & 2 & SOF (0x807F) \\ \hline 
+        2 & 1 & Packet ID \\ \hline
+        3 & 2 & Payload Size \\ \hline
+        5 & N & Payload Data \\ \hline
+        5+N & 2 & CRC16 \\ \hline 
+        7+N & 2 & EOF (0x8080) \\ \hline 
+    \end{tabular}
+    \caption{Customized data protocol}
+    \label{tab:com_protocol}
+\end{table}
+
+The pack and send function is demonstrated in pseudocode in Lists below.
+
+\begin{lstlisting}
+// Pack and send data to TX 
+procedure Send
+    buf[0 : 1] = SOF
+    buf[2] = id
+    buf[3 : 4] = size
+    buf[5 : 5+size-1] = data
+    crc = crc16(buf[2 : 5+size-1])
+    buf[5+size : 6+size] = crc
+    buf[7+size : 8+size] = EOF
+    send buf to serial
+endprocedure 
+\end{lstlisting}
+
+\begin{lstlisting}
+// Receive data from serial buffer
+procedure Receive
+    append serial buffer to buf
+    sof_idx = -1
+    eof_idx = -1
+    for i = 0 to eff_len(buf) - 2
+        if (buf[i:i+1] == SOF)
+            sof_idx = i
+        else if (buf[i:i+1] == EOF) 
+            unpack buf[sof_idx+2 : eof_idx-1]
+        endif
+    endfore 
+endprocedure 
+\end{lstlisting}
+
+\begin{lstlisting}
+// unpack data into the respective recv_dst
+function unpack (data)
+    id = data[0]
+    size = data[1 : 2]
+    calc_crc = crc16(data[0 : 2+size])
+    tran_crc = data[3+size : 4+size]
+    if (tran_crc == calc_crc)
+        recv_dst[id] = data[3 : 2+size]
+        if recv_callback[id] != NULL
+            recv_callback[id]()
+        endif
+    endif
+endfunction
+\end{lstlisting}
+
+We coded the following function to assign the destination pointer to \lstinline|recv_dst| array: 
+\begin{lstlisting}
+int communication_register_recv
+(communication_t comm, uint8_t pkt_id, void* data_ptr, 
+ size_t len, recv_callback_t callback)
+\end{lstlisting}
+
+\lstinline|callback| if called if packet of this ID is correctly received. 
+In this way, by using the following code
+\begin{lstlisting}
+void forward_roboarm_cmd() {
+    communication_send(&com_S3, ROBOARM_CMD_ID, 
+                       &fwd_roboarm_cmd, sizeof(fwd_roboarm_cmd));
+}
+void forward_sensor_fdbk() {
+    communication_send(&com_S2, SENSOR_FDBK_ID, 
+                       &fwd_sensor_fdbk, sizeof(fwd_sensor_fdbk));
+}
+void chassis_setup() {
+    communication_register_recv(&com_S2, ROBOARM_CMD_ID, &fwd_roboarm_cmd, 
+            sizeof(fwd_roboarm_cmd), (recv_callback_t)&forward_roboarm_cmd);
+    communication_register_recv(&com_S3, SENSOR_FDBK_ID, &fwd_sensor_fdbk, 
+            sizeof(fwd_sensor_fdbk), (recv_callback_t)&forward_sensor_fdbk);
+    ...
+\end{lstlisting}
+We can easily realize the data switching between the two (or even more, if needed) Arduino boards.
+ 
+% The SOF (start of frame) and EOF (end of frame) 
+
+\subsection{Protocol}
+With the communication module above, data can be easily exchanged by sending and receiving the packed structure. There are 4 types of packets: chassis command, chassis feedback, roboarm command, and sensor feedback. 
+
+In Arduino code, they are defined as
+
+
+\subsection{DC Motor speed control with PID}
+
+To measure the wheel speed, following macro function is coded to assign the motor and register encoder interrupt.
+\begin{lstlisting}
+#define MOTOR_ASSIGN(NAME, PIN_1, PIN_2, PIN_PWM, PIN_A, PIN_B)     \
+void isr_##NAME();                                                  \
+struct motor_device NAME = {                                        \
+    .pin_1 = PIN_1, .pin_2 = PIN_2, .pin_pwm = PIN_PWM,             \
+    .pin_ecd_A = PIN_A, .pin_ecd_B = PIN_B, .ecd_isr = isr_##NAME   \
+};                                                                  \
+void isr_##NAME(void) {                                             \
+    if(digitalRead(NAME.pin_ecd_B)) NAME.data.total_ecd++;          \
+    else NAME.data.total_ecd--;                                     \
+}
+\end{lstlisting}
+
+PID library developed by DJI Robomaster is borrowed 
+and applied to control the motors, with the four speed of mecanum as reference
+and encoder measured speed as feedback. The speed unit is is in RPM, and PID parameters used are
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|p{2in}|p{2in}|}
+       \hline 
+       Parameter  & Value  \\ \hline 
+       $k_p$  & 0.8 \\ \hline 
+       $k_i$ & 0.1 \\ \hline 
+       $k_d$ & 0 \\ \hline 
+       Maximum input error & 0 \\ \hline 
+       Maximum output & MOTOR\_DUTY\_MAX (255) \\ \hline 
+       Integral limit & MOTOR\_DUTY\_MAX / 5 (51) \\ \hline
+    \end{tabular}
+    \caption{Chassis wheel motor PID params}
+    \label{tab:chassis_pid_params}
+\end{table}
+
+\subsection{Line following}
+The raw line tracker value is stored in a 8-bit variable as
+\begin{lstlisting}
+value = (digitalRead(sensor->pin_3) << 3) |
+        (digitalRead(sensor->pin_2) << 2) |
+        (digitalRead(sensor->pin_1) << 1) |
+        (digitalRead(sensor->pin_0));
+\end{lstlisting}
+
+And an error is calculated based this value, if the two outer sensors see black, 
+then use the outer sensor's bias, otherwise, use the two inner sensors.  
+\begin{lstlisting}
+error = (((value & 0b1000) >> 3) - ((value & 0b0001))) * 3;
+if (error == 0)
+   error = ((value & 0b0100) >> 2) - ((value & 0b0010) >> 1);
+\end{lstlisting}
+
+Use this error as feedback, a PID controller is applied. The reference is always 0, and output is used to get the left and right side wheel speed as 
+\begin{lstlisting}
+left = 1 - pid_out;
+right = 1 + pid_out;
+\end{lstlisting}
+
+\subsection{Roboarm Calculate}
+For our 2-DoF roboarm, Joint-1 controls the backward-forward of the arm, which also change the height of the Joint-2. Joint-2 controls the pitch angle of the clamp. Thus the roboarm can be controlled via a height and an angle.
+
+Upon receiving the height, the angle $\theta$ of Join-1 servo is computed by 
+\begin{lstlisting}
+h = height - H_OFFSET;
+if (h > ARM_LEN)
+    h = ARM_LEN;
+theta = degrees( acos(h / (ARM_LEN + 0.1)) );
+\end{lstlisting}
+
+\subsection{Clamp close}
+When the ``close'' flag in roboarm command is 1, the clamp will close. It will first close util the 
+micro switch assert, and then close for a further 20 degrees to make the grabbing tight enough.
+This is implemented with the help of ``clamp\_tight'' flag. Each loop it will do
+\begin{lstlisting}
+if switch touched
+    clamp_deg = clamp_deg - 1
+    servo.set_angle(clamp_deg)
+    clamp_tight = false
+else if clamp_tight == false
+    clamp_deg = clamp_deg - 20
+    servo.set_angle(clamp_deg)
+    clamp_tight = true
+endif
+\end{lstlisting}

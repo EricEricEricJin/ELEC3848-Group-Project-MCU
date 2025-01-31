@@ -1,0 +1,27 @@
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+    \tikzstyle{every state}=[fill={rgb:black,1;white,6}, minimum size=1.2cm, text width=2cm, text centered]
+    \tikzset{node distance=5cm, auto}
+    
+    \node[state, initial](q1){IDLE};
+    \node[state, right of =q1] (q2) {FOLLOW};
+    \node [state, right of=q2](q3) {CV};
+    \node [state, below of = q3, xshift=-2.3cm](q4){DRAG};
+    \node [state, left of =q4] (q5){BACK TO LINE};
+    
+    \draw (q1) edge[loop above] node{No instruction} (q1);
+    \draw (q1) edge[above] node{Button is pressed} (q2);
+    \draw (q2) edge[loop above] node{No airplane found} (q2);
+    \draw (q2) edge[above] node{Airplane detected} (q3);
+    \draw (q3) edge[loop above] node{Distance$>$Threshold} (q3);
+    \draw (q3) edge node[sloped, below=0.5]{Distance$<=$Threshold} (q4);
+    \draw (q4) edge[loop above] node{IS HOLDING=0} (q4);
+    \draw (q4) edge[above] node{IS HOLDING=1} (q5);
+    \draw (q5) edge[loop above] node{FINISH FLAG=0} (q5);
+    \draw (q5) edge node[sloped, below=0.5]{FINISH FLAG=1} (q1);
+    \end{tikzpicture}
+    
+    \caption{Operation FSM}
+    \label{fig:fsm}
+\end{figure}

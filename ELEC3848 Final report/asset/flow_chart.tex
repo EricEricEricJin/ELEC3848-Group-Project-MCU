@@ -1,0 +1,30 @@
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2.5cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, minimum width=2.5cm, minimum height=1cm,text width=2cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110,text width=2cm, minimum width=1cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+
+\tikzstyle{decision} = [diamond, minimum width= 0.5cm, minimum height= 0.5cm,text width=2cm, text centered, draw=black, fill=green!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\begin{tikzpicture}[node distance=3.5cm]
+\node (start) [startstop] {IDLE};
+\node (pro1) [process, right of=start] {FOLLOW};
+\node (de1) [decision, right of= pro1] {Find the airplane?};\input{asset/flow_chart}
+\node (pro2) [process, right of=de1 ] {CV};
+\node (in1) [io, below of=pro2] {Measure distance};
+\node (de2) [decision, below of=in1] {Distace less than Threshold?};
+\node (pro3) [process, left of =de2] {DRAG};
+\node (de3) [decision, above of=pro3] {IS HOLDING?};
+\node (pro4) [process, left of=de3] {BACK TO LINE};
+\node (de4) [decision, left of =pro4] {Finish the task?};
+\draw [arrow] (start) -- (pro1);
+\draw [arrow] (pro1) -- (de1) ;
+
+\draw [arrow] (de1) -- node {Yes}(pro2);
+\draw[arrow] (pro2) --(in1);
+\draw [arrow] (in1)--(de2);
+\draw [arrow] (de2) -- node {Yes}(pro3);
+\draw [arrow] (pro3) -- (de3);
+\draw [arrow] (de3) -- node {Yes}(pro4);
+\draw [arrow] (pro4) -- (de4);
+\draw [arrow] (de4) -- node {Yes}(start);
+\end{tikzpicture}

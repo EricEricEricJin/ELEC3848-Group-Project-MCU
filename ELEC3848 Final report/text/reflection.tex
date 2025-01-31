@@ -1,0 +1,55 @@
+\section{Reflection}{
+
+When we are developing our robot, we met several challenges or difficulties. This section will talk about difficulties and our solutions.
+
+\subsection{Problem with DetectNet}{
+We mentioned that Computer Vision techniques are adopted to recognize the airplane. However, the process of detecting the airplane is not successful initially due to mainly two factors: 
+\begin{enumerate}
+    \item 
+    Our airplane, especially installed with a handle and a light source, is sometimes not similar to the training dataset of the Detectnet. 
+    \item
+    There may be some interference (i,e., human, chairs) when testing that avoid the model from recognizing the object. 
+\end{enumerate}
+
+To address the problem, We firstly tried to train our own model with our custom pictures as the training dataset. However, we met several issues such as the version incompatibility of Numpy and Pytorch on Jetson Nano. As a result, although we successfully have the training data, we eventually failed to finish validation and obtain a valid model.
+
+Instead of changing the model, we shift our focus to alter the environment to better fit the original training data from DetectNet. 
+We found that CV actually works well when the airplane is around 1 meter apart from the camera, and thus we will always follow this standard when making the black line and placing the airplane.
+% During the tasting of Detectnet, we also found that the bounding box of the model to the airplane aren't stable on many occations. 
+
+In order to remove any probable disturbances, we will also find places with no people appear in the camera. Finally, we observed that it is more easier if the airplane is placed at some angle between the camera. It seems that the confidence rate is expected to increase with the visibility of propeller and the body of the airplane.
+
+
+}
+
+\subsection{Problem with dragging}{
+After the model locates the airplane, the robot is expected to move towards the robot through light seeker as demonstrated in the required function. The process of dragging after the light seeking is initially difficult to solve because of several challenges: 
+\begin{enumerate}
+    \item 
+    The robots arm's servo motors' torque are too low and it is difficult to control the angle of mechanical claw to the ground. The mechanical claw is initially not able to rose to a certain degree as we wrote in the program. This overload phenomenon may destroy the servo motor and even the servos.
+    \item 
+    The four sensor installed on the mechanical claw are sometime not sensitive enough, but the mechanical claw may fail to hold the airplane tightly if the sensors are too sensitive.
+\end{enumerate}
+To mitigate the first problem, we added rubber band from robot arm and the Jetson nano board to decrease the load of the servo motor. We also used other things like ties and tape to strengthen the ability of robot arm to hold the heavy objects. In addition, the servo motors are rated to operate at 4.8-6.0V, so we bought a seperated Buck converter to provide around 5.5V voltage to the roboarm servos to make their torque higher than the one with USB powered.
+
+The second problems are relatively harder to solve, because it is time consuming to adjust the distance of various parameters. To achieve our aims, we fix the position of the sensors, make the handle become thicker, and increase the angle of the mechanical claw to better clamp the airplane.  
+
+}
+\subsection{Problems with Serial communication}
+    The Serial port socket on the Arduino extension board is too lose, and the transmission corrupts from time to time. We applied CRC16 checksum in protocol to eliminate dirty commands which could be dangerous, but timeout from time to time due to bad connections cannot be easily solved.
+    % With our original receive function, when one corrupted,  
+}
+
+\subsection{Problems with I2C communication with sensors}
+The 
+% fucking retard 
+bread board never works. The holes are so 
+% damn 
+lose and the I2C communication is interrupted by it from time to time. When request data from I2C bus, 
+if the connection is interrupted, the Arduino will wait forever for the data that should have arrived. As a result the program hangs at the I2C read operation and the car dies. 
+
+We identified the 
+% fucking 
+problem too late and did not have enough time to make a PCB or solder the Y-lines to share the I2C bus 
+robustly. As a result, in order to at least show you something and avoid a zero-mark in demo, we removed the INA226 and MPU6050 sensors both physically and in program, and connected the BMP and ToF directly to the extension board's two I2C ports to avoid using bread board. % Damn.
+% It is appreciated if 

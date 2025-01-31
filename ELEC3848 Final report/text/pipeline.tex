@@ -1,0 +1,34 @@
+\section{FSM and Flowcharts of our robot}{
+
+% \input{asset/flow_chart}
+
+\subsection{Jteson Nano}{
+\input{asset/state_transit}
+The FSM above illustrate how our robot works. 
+\begin{itemize}
+    \item 
+    Initially, after running the program, the robot will enter the ``IDLE'' mode. In this case, it will stop moving and wait for coming instructions. The program has a GUI allowing users to start and stop the task by clicking buttons. 
+    \item 
+    When the Start button is pressed, The robot will enter the ``FOLLOW'' mode to follow the black line that is placed beforehand. During the ``FOLLOW'' mode, the robot will also detect the airplane using \lstinline|detectnet|. 
+    \item 
+    When the robot successfully see the airplane, it will enter the ``CV'' mode. At this state, the robot will  move towards the light source on the landing gear of the airplane. 
+    \item 
+    When the distance between the airplane and the robot is close enough, the robot will enter the ``GRAB'' mode, the robot arm and the mechanical claw are activated to hold the handle on the airplane. 
+    There are in total 4 sensors on the claw with each's NC (normal-close) terminals connected in series, when anyone of them open, the circuit is open and ``IS HOLDING'' flag will become true, which means that the airplane is successfully dragged. 
+    \item 
+    When IS HOLDING is true, the robot will enter the ``BACK TO LINE'' state to go back to the line by moving backwards. 
+    \item 
+    As the line tracker at the back of the robot detect the black line, it will enter the ``HOMING'' state to track the line just like the initial ``FOLLOW'' stage, but in reverse direction. There will be a finish sign in the end of the black line such that all the sensor from the line tracker will detect the black color. 
+    
+\end{itemize}
+
+In this case, the finish flag becomes true. The whole process is finished after the mechanical claw releases  from the airplane and the state goes back to ``IDLE''.
+}
+}
+\subsection{Arduino}{
+Chassis Task:
+\input{asset/chasis_task_flow_chart}
+\newpage
+Roboarm Task:
+\input{asset/robort_arm_flow_chart}
+}

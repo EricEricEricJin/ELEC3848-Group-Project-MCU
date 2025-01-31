@@ -1,0 +1,113 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\usepackage{mathabx}
+\pagestyle{fancy}
+\geometry{a4paper,left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm}
+\author{
+    \begin{tabular}{lll}
+        Group number & D3-4 & \\
+        Group members & Jin Yushang & 3035855064 \\
+                      & Zou Chunyu & 3035946629 \\
+                      & Kuang Anke & 3035845708 \\
+                      & Ding Jiayi & 3036103626
+    \end{tabular}
+}
+\title{
+    ELEC3848 Final Project Report \\
+    Autonomous Towing Tractor for Model Plane Airfields
+}
+
+
+\date{}
+
+\rhead{GROUP D3-4}
+\lhead{ELEC3848 FINAL PROJECT REPORT}
+
+\begin{document}
+
+\setlength{\parindent}{0em}
+
+\maketitle
+
+\begin{abstract}
+    In this project we made an autonomous model plane towing truck for model plane airfields. It uses two Arduino mega 2560 boards and one Nvidia Jetson Nano. 
+     It can move along traces, detect the plane with camera, automatically move towards the plane, grab the plane with a roboarm, and finally tow the plane back to home. 
+\end{abstract}
+
+
+
+\textbf{Arduino code: } \url{https://github.com/EricEricEricJin/ELEC3848-Group-Project-MCU} \\
+\textbf{Jetson code: } \url{https://github.com/Zou-2004/ELEC3848-Jetson/tree/main/tracker_test_v3} \\
+\textbf{Demo vodeo: } \url{https://www.youtube.com/watch?v=utF52RqBWJA}
+
+% TALK IS CHEAP, SHOW ME THE CODE. 
+% READ OUR CODE FIRST OR YOU MAY FEEL CONFUSED WHEN READING THIS REPORT.
+\begin{figure}[H]
+\includegraphics[scale=0.75]{asset/pic_of _robot/robot.png}
+\centering
+\end{figure}
+
+
+
+\newpage 
+
+\tableofcontents
+
+\newpage 
+
+\input{text/Introduction}
+
+\newpage 
+
+\input{text/hw}
+
+\newpage
+
+\section{Program structure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{asset/elec3848_ard_framework.png}
+    \caption{Arduino program structure}
+    \label{fig:ard_prgm_struct}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{asset/jetson_struct.png}
+    \caption{Jetson program structure}
+    \label{fig:jet_prgm_struct}
+\end{figure}
+
+\newpage
+
+
+\input{text/pipeline}
+
+\newpage
+\input{text/tech_detail}
+\newpage 
+
+\input{text/reflection}
+
+% \input{text/Conclusion}
+% \input{asset/chasis_task_flow_chart}
+% \input{asset/robort_arm_flow_chart}
+
+\end{document}
