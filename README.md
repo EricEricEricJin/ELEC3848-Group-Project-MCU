@@ -10,7 +10,7 @@ Two applications run on two boards are selected by jump-wire as in `application/
 - `application/chassis`: for chassis control board 
 - `application/roboarm`: for roboarm control board 
 
-_Proposal and final report to be added later._
+Final report: [ELEC3848_Final_report.pdf](ELEC3848_Final_report.pdf)
 
 Coding style is heavily inspired by and some modules are borrown from the projects below:  
 - DJI Robomaster. RoboRTS-Firmware. [https://github.com/RoboMaster/roboRTS-Firmware/](https://github.com/RoboMaster/roboRTS-Firmware/)
